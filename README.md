@@ -100,6 +100,8 @@
 
 ![image-20201120010645211](README.assets/image-20201120010645211.png)
 
+#### 데이터 생성 코드
+
 ```python
 from django.shortcuts import render
 import requests
@@ -300,7 +302,9 @@ def tmdb(request):
 
 
 
-### 부록
+## dummy data
+
+### day1_1119
 
 - 네이버 API
 
