@@ -1,25 +1,25 @@
 from django import forms
-from .models import MovieReview, MovieReviewComment, MovieOneline
+from .models import Review, Comment, Oneline
 
 
-class MovieReviewForm(forms.ModelForm):
+class ReviewForm(forms.ModelForm):
     
     class Meta:
-        model = MovieReview
+        model = Review
         fields = ['title', 'content',]
 
 
-class MovieReviewCommentForm(forms.ModelForm):
+class CommentForm(forms.ModelForm):
 
     class Meta:
-        model = MovieReviewComment
-        fields = '__all__'
+        model = Comment
+        fields = ['content',]
         # exclude = ['article', 'user',]
 
 
-class MovieOnelineForm(forms.ModelForm):
+class OnelineForm(forms.ModelForm):
 
     class Meta:
-        model = MovieOneline
-        fields = '__all__'
+        model = Oneline
+        fields = ['content',]
         # exclude = ['article', 'user',]

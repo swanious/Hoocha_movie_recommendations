@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1 class="text-center">Movie Review Create</h1>
-  <form action="#" method="POST">
+  <h1 class="text-center">Oneline Update</h1>
+  <form action="{% url 'movies:review_update' review.movie.id review.id %}" method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit">

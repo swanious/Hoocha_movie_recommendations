@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+
 
 # Create your models here.
 class Movie(models.Model):
@@ -15,6 +17,8 @@ class Movie(models.Model):
     adult = models.BooleanField(default=False)
     overview = models.TextField()
     poster_path = models.TextField()
+    
+    watch_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watch_movies')
 
 
 class Genre(models.Model):
@@ -23,8 +27,10 @@ class Genre(models.Model):
     movies = models.ManyToManyField(Movie, related_name='genres') # 중계모델
 
 
-class MovieReview(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_reviews')
+class Review(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
 
     title = models.CharField(max_length=50)
     content = models.TextField()
@@ -32,8 +38,9 @@ class MovieReview(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
-class MovieReviewComment(models.Model):
-    movie_review = models.ForeignKey(MovieReview, on_delete=models.CASCADE, related_name='movie_review_comments')
+class Comment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='comments')
 
     content = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
@@ -41,10 +48,13 @@ class MovieReviewComment(models.Model):
     
 
 
-class MovieOneline(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='movie_onelines')
+class Oneline(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='onelines')
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_onelines')
 
     content = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
+

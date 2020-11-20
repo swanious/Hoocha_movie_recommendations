@@ -4,27 +4,26 @@ from . import views
 app_name = 'movies'
 
 urlpatterns = [
+    # path('data/', views.tmdb, name='data'),
     path('', views.index, name='index'),
     path('<int:movie_id>/', views.detail, name='detail'),
 
-    # # movie_review
-    path('<int:movie_id>/movie_review_list/', views.movie_review_list, name='movie_review_list'),
-    path('<int:movie_id>/movie_review/create/', views.movie_review_create, name='movie_review_create'),
-    path('<int:movie_id>/movie_review/<int:movie_review_id>/', views.movie_review_detail, name='movie_review_detail'),
-    # path('<int:movie_id>/movie_review/<int:movie_review_id>/update/', views.movie_review_update, name='movie_review_update'),
-    # path('<int:movie_id>/movie_review/<int:movie_review_id>/delete/', views.movie_review_delete, name='movie_review_delete'),
+    # review
+    path('<int:movie_id>/review_list/', views.review_list, name='review_list'),
+    path('<int:movie_id>/review/create/', views.review_create, name='review_create'),
+    path('<int:movie_id>/review/<int:review_id>/', views.review_detail, name='review_detail'),
+    path('<int:movie_id>/review/<int:review_id>/update/', views.review_update, name='review_update'),
+    path('<int:movie_id>/review/<int:review_id>/delete/', views.review_delete, name='review_delete'),
     
-    # # movie_review_comment
-    # path('<int:movie_id>/movie_review/<int:movie_review_id>/movie_review_comment_create/', views.movie_review_comment_create, name='movie_review_comment_create'),
-    # path('<int:movie_id>/movie_review/<int:movie_review_id>/movie_review_comment_update/', views.movie_review_comment_update, name='movie_review_comment_update'),
-    # path('<int:movie_id>/movie_review/<int:movie_review_id>/movie_review_comment_delete/', views.movie_review_comment_delete, name='movie_review_comment_delete'),
+    # comment
+    path('<int:movie_id>/review/<int:review_id>/comment_create/', views.comment_create, name='comment_create'),
+    # path('<int:movie_id>/review/<int:review_id>/comment/<int:comment_id>/update/', views.comment_update, name='comment_update'),
+    path('<int:movie_id>/review/<int:review_id>/comment/<int:comment_id>/delete/', views.comment_delete, name='comment_delete'),
 
 
-    # # movie_oneline_comment
-    # path('<int:movie_id>/movie_oneline_comment/', views.movie_oneline_comment, name='movie_oneline_comment'),
-    # path('<int:movie_id>/movie_oneline_comment/create/', views.movie_oneline_comment_create, name='movie_oneline_comment_create'),
-    # path('<int:movie_id>/movie_oneline_comment/<int:movie_oneline_comment_id>/update/', views.movie_oneline_comment_update, name='movie_oneline_comment_update'),
-    # path('<int:movie_id>/movie_oneline_comment/<int:movie_oneline_comment_id>/delete/', views.movie_oneline_comment_delete, name='movie_oneline_comment_delete'),
-
-    path('data/', views.tmdb, name='data'),
+    # oneline
+    path('<int:movie_id>/oneline/', views.oneline_list, name='oneline_list'),
+    path('<int:movie_id>/oneline/create/', views.onelinet_create, name='oneline_create'),
+    # path('<int:movie_id>/oneline/<int:oneline_id>/update/', views.oneline_update, name='oneline_update'),
+    path('<int:movie_id>/oneline/<int:oneline_id>/delete/', views.oneline_delete, name='oneline_delete'),
 ]

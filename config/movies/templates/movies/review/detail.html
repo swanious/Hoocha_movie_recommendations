@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>리뷰</h1>
+  <p>{{ review.content }}</p>
+
+  <!-- review_update -->
+  <a href="{% url 'movies:review_update' review.movie.id review.id %}">UPDATE</a>
+  
+  <!-- review_delete -->
+  <form action="{% url 'movies:review_delete' review.movie.id review.id %}" method="POST">
+    {% csrf_token %}
+    <button>DELETE</button>
+  </form>
+
+  <hr>
+
+  <!-- comment create -->
+  <h1>댓글 작성</h1>
+  <form action="{% url 'movies:comment_create' review.movie.id review.id %}" method="POST">
+    {% csrf_token %}
+    <div class="ml-1 row align-content-center">
+      <span>{{ comment_form }}</span>
+      <span><input type="submit"></span>
+    </div>
+  </form>
+
+  <hr>
+
+
+  <h1>댓글</h1>
+  {% for comment in comments %}
+    <p>{{ comment.content }}</p>
+    <!-- comment delete -->
+    <form action="{% url 'movies:comment_delete' review.movie.id review.id comment.id %}" method="POST">
+      {% csrf_token %}
+      <button>DELETE</button>
+    </form>
+  {% endfor %}
+  <a href="{% url 'movies:review_list' review.movie.id %}">[back]</a>
+{% endblock %}

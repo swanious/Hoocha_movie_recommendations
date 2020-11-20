@@ -16,4 +16,7 @@
 <p>{{ movie.overview }}</p>
 <img src="{{ movie.poster_path }}" alt="movie_poster">
 
+<a href="{% url 'movies:oneline_list' movie.id %}">한줄평</a>
+<a href="{% url 'movies:review_list' movie.id %}">리뷰</a>
+<a href="{% url 'movies:index' %}">BACK</a>
 {% endblock content %}
