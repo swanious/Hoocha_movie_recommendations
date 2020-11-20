@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>MOVIE DETAIL</h1>
+<p>{{ movie.title }}</p>
+<p>{{ movie.popularity }}</p>
+<p>{{ movie.video }}</p>
+<p>{{ movie.vote_count }}</p>
+<p>{{ movie.vote_average }}</p>
+<p>{{ movie.release_date }}</p>
+<p>{{ movie.original_language }}</p>
+<p>{{ movie.original_title }}</p>
+<img src="{{ movie.backdrop_path }}" alt="movie_img">
+<p>{{ movie.adult }}</p>
+<p>{{ movie.overview }}</p>
+<img src="{{ movie.poster_path }}" alt="movie_poster">
+
+{% endblock content %}

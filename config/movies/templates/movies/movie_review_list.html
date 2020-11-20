@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-center">Movie Review List</h1>
+  {% for movie_review in movie_reviews %}
+  <p>{{ movie_review }}</p>
+  {% endfor %}
+{% endblock %}
