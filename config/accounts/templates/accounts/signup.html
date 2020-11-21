@@ -4,8 +4,14 @@
 <h1>회원가입</h1>
 <form action="" method="POST">
   {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit">
+  {% for field in form %}
+    <div class="form-group">
+      {{ field.errors }}
+      {{ field.label }}
+      {{ field }}
+    </div>
+  {% endfor %}
+  <input class="d-inline btn btn-primary" type="submit">
+  <a class="btn btn-primary" href="{% url 'movies:index' %}">back</a>
 </form>
-<a href="{% url 'movies:index' %}">back</a>
 {% endblock %}

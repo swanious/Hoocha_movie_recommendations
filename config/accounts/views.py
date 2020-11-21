@@ -8,7 +8,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_http_methods, require_safe
 from django.contrib.auth import get_user_model, update_session_auth_hash
-from .forms import CustomUserChangeForm, CustomUserCreationForm
+from .forms import CustomUserChangeForm, CustomUserCreationForm, CustomLoginForm, CustomPasswordChangeForm
 
 # Create your views here.
 @require_http_methods(['GET', 'POST'])
@@ -36,14 +36,14 @@ def login(request):
         return redirect('movies:index')
         
     if request.method == 'POST':
-        form = AuthenticationForm(request, request.POST)
+        form = CustomLoginForm(request, request.POST)
         if form.is_valid():
             # 로그인
             auth_login(request, form.get_user())
             print(request.GET.get('next'))
             return redirect(request.GET.get('next') or 'movies:index')
     else:
-        form = AuthenticationForm()
+        form = CustomLoginForm()
     context = {
         'form': form,
     }
@@ -83,13 +83,13 @@ def delete(request):
 @require_http_methods(['GET', 'POST'])
 def change_password(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
             return redirect('movies:index')
     else:
-        form = PasswordChangeForm(request.user)
+        form = CustomPasswordChangeForm(request.user)
     context = {'form': form}
     return render(request, 'accounts/change_password.html', context)
 

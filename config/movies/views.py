@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods ,require_POST
-
 from django.contrib.auth.decorators import login_required
 
 from .models import Movie, Genre, Review, Comment, Oneline
@@ -25,6 +24,7 @@ def detail(request, movie_id):
         'movie': movie,
     }
     return render(request, 'movies/detail.html', context)
+
 
 '''
 영화 끝
@@ -93,15 +93,16 @@ def review_update(request, movie_id, review_id):
                     return redirect('movies:review_detail', movie_id, review_id)
             else:
                 form = ReviewForm(instance=review)
-        context = {
-            'review':review,
-            'form': form,
-        }
-        return render(request, 'movies/review/update.html', context)
+            context = {
+                'review':review,
+                'form': form,
+            }
+            return render(request, 'movies/review/update.html', context)
+        return redirect('movies:review_detail', movie_id, review_id)
     return redirect('accounts:login')
 
 
-# @require_POST
+@require_POST
 def review_delete(request, movie_id, review_id):
     if request.user.is_authenticated:
         review = get_object_or_404(Review, id=review_id)
@@ -267,6 +268,89 @@ def oneline_delete(request, movie_id, oneline_id):
 #         return redirect('articles:index')
 #     return redirect('accounts:login')
 
+'''
+좋아요 끝
+
+################################################################
+
+추천 알고리즘 시작
+'''
+# from django.db.models import Q      
+
+
+# host = 'https://api.openweathermap.org'
+# path = '/data/2.5/onecall'
+# params = {
+#     'lat': '35.1595454',
+#     'lon': '126.8526012',
+#     'appid': 'fb274443560bf75e3801324989c0959e',
+#     'lang': 'kr',
+# }
+# url = host + path
+
+
+# @require_GET
+# def recommended(request):
+#     # api 요청
+#     response = requests.get(url, params=params)
+#     data = response.json()
+#     weather_id = str(data["current"]["weather"][0]["id"])
+#     temp = data["current"]["temp"] - 273.15
+    
+#     if weather_id[0] == '2':
+#         genre = ['53', '27', '9648']
+#         weather_id = '천둥치는'
+#     elif weather_id[0] == '3':
+#         genre = ['10749', '18', '10402']
+#         weather_id = '이슬비 내리는'
+#     elif weather_id[0] == '5':
+#         genre = ['53', '10770', '99']
+#         weather_id = '비오는 '
+#     elif weather_id[0] == '6':
+#         genre = ['10749', '18', '35']
+#         weather_id = '소복소복 눈내리는'
+#     elif weather_id[0] == '7':
+#         genre = ['12', '9648', '14']
+#         weather_id = '먼지날리는'
+#     elif weather_id[0] == '8':
+#         # 맑은날씨
+#         if weather_id[2] == '0':
+#             if temp <= 0:
+#                 genre = ['99', '80', '37']
+#             elif 0 < temp <= 15:
+#                 genre = ['35', '36', '10402']
+#             else:
+#                 genre = ['53', '27', '9648']
+#             weather_id = '구름한점 없이 맑은'
+#         # 흐린날씨
+#         else:
+#             if temp <= 0:
+#                 genre = ['10770', '12', '10402']
+#             elif 0 < temp <= 15:
+#                 genre = ['10752', '99', '36']
+#             else:
+#                 genre = ['14', '28', '878']  
+#             weather_id = '구름이 많은'
+    
+
+#     # 조건문에 따른 필터링 (id, temp를 활용)
+
+#     movies = Movie.objects.filter(Q(genres=genre[0]) | Q(genres=genre[1]) | Q(genres=genre[2]))
+#     context = {
+#         'movies': movies,
+#         'weather_id': weather_id,
+#         'temp': temp
+#     }
+#     return render(request, 'movies/recommended.html', context)
+
+
+'''
+추천 알고리즘 끝
+
+################################################################
+
+데이터 시작
+'''
 
 @require_http_methods(['GET'])
 def tmdb(request):

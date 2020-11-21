@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 class Movie(models.Model):
@@ -18,7 +18,14 @@ class Movie(models.Model):
     overview = models.TextField()
     poster_path = models.TextField()
     
-    watch_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watch_movies')
+    watch_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watch_movies', through='History')
+    
+
+class History(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
 
 class Genre(models.Model):
@@ -47,12 +54,12 @@ class Comment(models.Model):
     updated = models.DateTimeField(auto_now=True)
     
 
-
 class Oneline(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='onelines')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_onelines')
 
+    vote_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], default=0)
     content = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

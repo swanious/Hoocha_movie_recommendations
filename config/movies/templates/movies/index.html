@@ -2,10 +2,53 @@
 
 {% block content %}
 <h1>MOVIE LIST</h1>
+<ul class="pagination">
+  <li class="page-item">
+    <a class="page-link" href="#" aria-label="Previous">
+      <span aria-hidden="true">&laquo;</span>
+    </a>
+  </li>
 
 {% for movie in movies %}
-  <a href="{% url 'movies:detail' movie.id %}">
+  <!-- modal button -->
+  <a data-toggle="modal" data-target="#staticBackdrop{{ movie.id }}">
     <img src="{{ movie.poster_path }}" alt="{{ movie.title }}">
   </a>
+
+  <!-- Modal -->
+  <div width="500px" class="modal fade" id="staticBackdrop{{ movie.id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">{{ movie.title }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img width="450px" src="{{ movie.backdrop_path }}" alt="movie_img">
+          <p>{{ movie.popularity }}</p>
+          <p>{{ movie.video }}</p>
+          <p>{{ movie.vote_count }}</p>
+          <p>{{ movie.vote_average }}</p>
+          <p>{{ movie.release_date }}</p>
+          <p>{{ movie.original_language }}</p>
+          <p>{{ movie.original_title }}</p>
+          <p>{{ movie.adult }}</p>
+          <p>{{ movie.overview }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endfor %}
+
+  <li class="page-item">
+    <a class="page-link" href="#" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </li>
+</ul>
 {% endblock content %}

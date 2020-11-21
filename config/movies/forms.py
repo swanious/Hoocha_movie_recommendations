@@ -21,5 +21,5 @@ class OnelineForm(forms.ModelForm):
 
     class Meta:
         model = Oneline
-        fields = ['content',]
+        fields = ['content', 'vote_rating']
         # exclude = ['article', 'user',]

@@ -4,7 +4,15 @@
 <h1>로그인</h1>
 <form action="" method="POST">
   {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit">
+  {% for field in form %} 
+    <div class="form-group">
+      {{ field.errors }}
+      {{ field.label }}
+      {{ field }}
+    </div>
+  {% endfor %}
+  <input class="btn btn-primary" type="submit">
+  <a class="btn btn-primary" href="{% url 'movies:index' %}">뒤로</a>
+
 </form>
 {% endblock %}

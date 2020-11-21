@@ -5,6 +5,7 @@
   <a href="{% url 'movies:oneline_create' movie_id %}">한줄평 작성</a>
   {% for oneline in onelines %}
     <div class="mt-3 row align-content-center">
+      <p>{{ oneline.vote_rating }}</p>
       <p>{{ oneline.content }}</p>
       <form action="{% url 'movies:oneline_delete' oneline.movie.id oneline.id %}" method="POST">
         {% csrf_token %}

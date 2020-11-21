@@ -319,9 +319,114 @@ def tmdb(request):
 
 ## day3_1121
 
-#### 추천 알고리즘
+> 사용자 인증 & 권한 페이지 기능 구현
+>
+> widget활용 부트스트랩 클래스 적용
+>
+> 영화 디테일 화면 구성 (bootstrap modal 컴포넌트 활용)
 
-- 1개 이상의 알고리즘을 활용
+- 메인 화면
+  - 횡스크롤 형식의 메인 페이지 구성
+  - 영화 클릭시 Modal 형식으로 디테일 화면으로 전환
+
+![image-20201121225703252](README.assets/image-20201121225703252.png)
+
+- 디테일 화면
+
+![image-20201121225619741](README.assets/image-20201121225619741.png)
+
+
+
+- 회원가입 페이지
+  - 부트스트랩 위젯 적용
+
+![image-20201121230529696](README.assets/image-20201121230529696.png)
+
+- 회원 정보 수정 페이지
+  - 내부 비밀번호 변경 페이지 삽입
+
+![image-20201121230337052](README.assets/image-20201121230337052.png)
+
+- 비밀번호 변경 페이지
+
+![image-20201121230436723](README.assets/image-20201121230436723.png)
+
+- accounts / forms.py
+
+```python
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCreationForm, PasswordChangeForm
+from django.contrib.auth import get_user_model
+from django import forms
+
+
+class CustomLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        class_update_fields = ['username', 'password']
+        for field_name in class_update_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control',
+            })
+
+
+class CustomUserChangeForm(UserChangeForm):
+
+    password = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        class_update_fields = ['email', 'first_name', 'last_name']
+        for field_name in class_update_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'first_name', 'last_name',)
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        class_update_fields = ['old_password', 'new_password1', 'new_password2']
+        for field_name in class_update_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = get_user_model()
+        fields = ('old_password', 'new_password1', 'new_password2',)
+
+
+class CustomUserCreationForm(UserCreationForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        class_update_fields = ['email', 'password1', 'password2']
+        for field_name in class_update_fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'username',
+            'email',
+            'password1',
+            'password2',
+        )
+        widgets = {
+            'username': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                }
+            ),
+        }
+```
 
 
 
