@@ -1,0 +1,33 @@
+:root {
+  font-size: 16px;
+  --text-primary: #b6b6b6;
+  --text-secondary: #ececec;
+  --bg-primary: #23232e;
+  --bg-secondary: #141418;
+  --transition-speed: 600ms;
+
+}
+
+body { overflow: auto; } 
+body::before { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background-color: #f7a492;
+  background-repeat : no-repeat;
+  background-size: cover;
+  -webkit-filter: blur(5px); 
+  -moz-filter: blur(5px); 
+  -o-filter: blur(5px); 
+  -ms-filter: blur(5px); 
+  filter: blur(5px); 
+  transform: scale(1.02); 
+  z-index: -1; 
+  content: ""; 
+  }
+
+.movie-image {
+  padding: 0;
+}

@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <ul class="navbar-nav">
+    <!-- logo -->
+    <li class="logo">
+      <a href="{% url 'movies:index' %}" class="nav-link">
+        <i class="far fa-arrow-alt-circle-right"></i>
+        <span class="link-text">hoocha</span>
+      </a>
+    </li>
+
+    <!-- menu -->
+    <li class="nav-item">
+      <a href="{% url 'movies:index' %}" class="nav-link">
+        <i class="fas fa-home"></i>
+        <span class="link-text">Home</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'movies:review_list' movie.id %}" class="nav-link">
+        <i class="fas fa-pencil-alt"></i>
+        <span class="link-text">Review</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'movies:oneline_list' movie.id %}" class="nav-link">
+        <i class="fas fa-star"></i>
+        <span class="link-text">Comment</span>
+      </a>
+    </li>
+  </ul>
+</nav>

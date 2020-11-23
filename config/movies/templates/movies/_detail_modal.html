@@ -1,0 +1,68 @@
+<!-- Modal -->
+<div
+  width="500px"
+  class="modal fade"
+  id="staticBackdrop{{ movie.id }}"
+  data-backdrop="static"
+  data-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">{{ movie.title }}</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div>
+        <div class="modal-body">
+          {% include 'movies/_modal_navbar.html' %}
+          <main>
+          <div class="container">
+            <div class="row mb-3">
+              <div class="col-sm-12 col-md-3">
+                <img class="col-12 m-1 modal-poster" src="{{ movie.poster_path }}"alt="movie_img"/>
+              </div>
+              <div class="col-sm-12 col-md-9">
+                <h3>{{ movie.title }}</h3>
+                <p>{{ movie.original_title }}</p>
+                <hr>
+                <p>♡ {{ movie.popularity }}</p>
+                <div><p><h5>추천수</h5> | {{ movie.vote_count }}</p></div>
+                <div><p><h5>평점</h5> | {{ movie.vote_average }}</p></div>
+                <p>{{ movie.release_date }} 개봉</p>
+              </div>
+            </div>
+            <div>
+              <h5>줄거리</h5>
+              <p>{{ movie.overview }}</p>
+              <hr>
+            </div>
+          </div>
+
+            <img
+              src="{{ movie.backdrop_path }}"
+              alt="movie_img"/>
+
+ 
+            
+          </main>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close-button btn" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
