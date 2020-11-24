@@ -4,7 +4,7 @@
 
 <!-- css -->
 {% block modal %}
-  <link rel="stylesheet" href="{% static 'stylesheets/modal.css' %}">
+  <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 {% endblock %}
 
 <!-- content -->
@@ -16,7 +16,7 @@
           <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">          
             {% for movie in movieList %}
               <a data-toggle="modal" data-target="#staticBackdrop{{ movie.id }}">
-                <img class="movie-imagecol-sm-4 col-md-2" src="{{ movie.poster_path }}" alt="{{ movie.title }}">
+                <img class="movie-image col-sm-4 col-md-2" src="{{ movie.poster_path }}" alt="{{ movie.title }}">
               </a>
             {% endfor %}
           </div>

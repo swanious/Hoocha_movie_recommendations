@@ -1,21 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
   <h2>{{ person.username }}님의 프로필</h2>
   <hr>
-
-  <h3>{{ person.username }}님이 작성한 글</h3>
-  {% for review in person.review_set.all %}
-    <p>글번호: {{ review.id }}</p>
-    <p>제목: {{ review.title }}</p>
-    <hr>
-  {% endfor %}
-
-  <h3>{{ person.username }}님이 좋아요한 글</h3>
-  {% for review in person.reviews.all %}
-    <p>글번호: {{ review.pk }}</p>
-    <p>제목: {{ review.title }}</p>
-    <hr>
-  {% endfor %}
-  <a href="{% url 'reviews:index' %}">[back]</a>
+  <h3>찜한 영화 목록</h3>
+  <hr>
+  <h3>남긴 평점</h3>
+  <hr>
+  <h3>작성한 리뷰</h3>
+  <a href="{% url 'movies:index' %}">[back]</a>
+</div>
 {% endblock  %}

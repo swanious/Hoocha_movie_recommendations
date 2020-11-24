@@ -1,17 +1,34 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block authentication_style %}
+  <link rel="stylesheet" href="{% static 'css/authentication_style.css' %}">
+{% endblock  %}
+
 
 {% block content %}
-<h1>회원가입</h1>
-<form action="" method="POST">
-  {% csrf_token %}
-  {% for field in form %}
-    <div class="form-group">
-      {{ field.errors }}
-      {{ field.label }}
-      {{ field }}
+
+<div class="container">
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-xs-12 col-md-8">
+      <div class="login-box">
+        <h1 class="text-monospace">회원가입</h1>
+        <form class="d-flex flex-column" action="" method="POST">
+          {% csrf_token %}
+          {% for field in form %} 
+            <div class="form-group">
+              <span>{{ field.errors }}</span>
+              {{ field.label }}
+              {{ field }}
+            </div>
+          {% endfor %}
+          <br>
+          <input class="login-button btn mt-3" type="submit">
+        </form>
+      </div>
     </div>
-  {% endfor %}
-  <input class="d-inline btn btn-primary" type="submit">
-  <a class="btn btn-primary" href="{% url 'movies:index' %}">back</a>
-</form>
+    <div class="col-2"></div>
+  </div>
+</div>
 {% endblock %}

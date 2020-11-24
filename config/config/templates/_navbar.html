@@ -1,0 +1,65 @@
+<!--네이게이션바 시작-->
+<nav class="navbar">
+  <ul class="navbar-nav">
+    <!--logo-->
+    <li class="logo">
+      <a href="{% url 'movies:index' %}" class="nav-link">
+        <span class="link-text logo-text">HOOCHA</span>
+        <i class="fas fa-video"></i>
+      </a>
+    </li>
+
+    <!-- nav items -->
+    {% if request.user.is_authenticated %}
+    <!-- 프로필 안에 회원정보 수정 페이지 삽입하기 ! -->
+    <!-- 프로필 -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'accounts:profile' user.username %}">
+        <i class="fas fa-user-circle"></i>
+        <span class="link-text">프로필</span>
+      </a>
+    </li>
+    <!-- 정보 수정 -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'accounts:update' %}">
+        <i class="fas fa-user-circle"></i>
+        <span class="link-text">정보 수정</span>
+      </a>
+    </li>
+    <!-- 로그아웃 -->
+    <li class="nav-item">
+      <form class="nav-link" action="{% url 'accounts:logout' %}" method="POST">
+        {% csrf_token %}
+        <i class="fas fa-sign-out-alt"></i>
+        <input class="btn btn-dark" type="submit" value="로그아웃">
+      </form>
+    </li>
+    {% else %}
+    <!-- 회원가입 -->
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'accounts:signup' %}">
+        <span class="link-text">회원가입</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'accounts:login' %}">
+        <span class="link-text">로그인</span>
+      </a>
+    </li>
+    {% endif %}
+
+    <li class="nav-item" id="themeButton">
+      <a class="nav-link">
+        <i id="darkIcon" class="theme-icon fas fa-moon"></i>
+        <i id="lightIcon" class="theme-icon fas fa-sun"></i>
+        <i id="solarIcon" class="theme-icon fas fa-umbrella-beach"></i>
+        <i id="pastelIcon" class="theme-icon fas fa-palette"></i>
+        <span class="link-text">theme</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+<!-- 네비게이션바 끝 -->
+
+{% block theme %}
+{% endblock  %}

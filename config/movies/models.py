@@ -20,7 +20,7 @@ class Movie(models.Model):
     
     watch_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watch_movies', through='History')
     
-
+    
 class History(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

@@ -2,7 +2,6 @@ from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCr
 from django.contrib.auth import get_user_model
 from django import forms
 
-
 class CustomLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -11,6 +10,7 @@ class CustomLoginForm(AuthenticationForm):
             self.fields[field_name].widget.attrs.update({
                 'class': 'form-control',
             })
+
 
 
 class CustomUserChangeForm(UserChangeForm):

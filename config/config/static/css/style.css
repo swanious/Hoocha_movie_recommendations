@@ -1,0 +1,288 @@
+/* body { overflow: auto; }  */
+/* body::before { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background-color: #f7a492;
+  background-repeat : no-repeat;
+  background-size: cover;
+  -webkit-filter: blur(5px); 
+  -moz-filter: blur(5px); 
+  -o-filter: blur(5px); 
+  -ms-filter: blur(5px); 
+  filter: blur(5px); 
+  transform: scale(1.02); 
+  z-index: -1; 
+  content: ""; 
+  } */
+
+
+
+:root {
+  font-size: 16px;
+  font-family: 'Open Sans';
+  --text-primary: #b6b6b6;
+  --text-secondary: #ececec;
+  --bg-primary: #23232e;
+  --bg-secondary: #141418;
+  --transition-speed: 600ms;
+
+}
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: auto;
+  background-color: var(--bg-secondary);
+}
+
+body::after {
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background: url('../backgroundimages/image.png');
+  opacity: 0.5;
+  background-repeat : no-repeat;
+  background-size: cover; 
+  overflow: auto;
+  z-index: -1;
+  content: "";
+}
+
+body::-webkit-scrollbar {
+  width: 0.25rem;
+  height: 0rem;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: #640c09;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #370604;
+}
+
+/* 
+  list-style은 ul, ol, li요소에 주는 스타일
+  flex-direction을 column으로 주면 요소가 열순서로 바뀜
+  height 100%는 window창에 맞게 주기 위함
+*/
+
+main {
+  margin-left: 5rem;
+  padding: 1rem;
+}
+
+.navbar {
+  z-index: 10;
+  padding: 0;
+  position: fixed;
+  background-color: var(--bg-primary);
+  transition: width 600ms ease;
+  overflow: hidden;
+}
+
+
+.navbar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-item {
+  width: 100%;
+}
+
+.nav-item:last-child {
+  margin-top: auto;
+}
+
+/* 
+  nav-link는 버튼이라고 보면 됨
+  filter는 흐림 효과나 색상 변형 등 그래픽 효과를 요소에 적용(보통 이미지, 배경, 테두리 렌더링 조정)
+  opacity - 불투명도(0으로 갈수록 흐릿)
+  grayscale - 흑백으로 변환(100%일 경우 완전 흑백)
+*/
+.nav-link {
+  display: flex;
+  align-items: center;
+  height: 5rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  filter: grayscale(100%) opacity(0.7);
+  transition: var(--transition-speed);
+}
+
+.nav-link i {
+  width: 2rem;
+  min-width: 2rem;
+  margin: 0 1.5rem;
+}
+
+/* 
+  mouseover할 경우 동작
+  opa 0.7에서 1로 또렷해짐
+  흑백에서 원본으로
+*/
+.nav-link:hover {
+  filter: grayscale(0%) opacity(1);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.link-text {
+  display: none;
+  margin-left: 1rem;
+}
+
+.navbar:hover {
+  width: 16rem;
+}
+
+.navbar:hover .link-text{
+  display: block;
+}
+
+.navbar:hover .logo i {
+  transform: rotate(180deg);
+}
+
+
+.logo {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  font-size: 1.5rem;
+  letter-spacing: 0.3ch;
+  width: 100%;
+}
+
+.logo i {
+  transform: rotate(0deg);
+  transition: var(--transition-speed);
+}
+
+.logo-text
+{
+  display: inline;
+  position: absolute;
+  left: -999px;
+  transition: var(--transition-speed);
+}
+
+
+@media only screen and (max-width: 600px) {
+  
+  .navbar {
+    top: 0;
+    width: 100vw;
+    height: 5rem;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .navbar-nav {
+    flex-direction: row;
+  }
+  
+  .nav-link {
+    justify-content: center;
+  }
+  
+  main {
+    margin: 0;
+  }
+
+}
+
+@media only screen and (min-width: 600px) {
+  .navbar {
+    top: 0;
+    width: 5rem;
+    height: 100%;
+  }
+
+  .navbar:hover {
+    width: 16rem;
+  }
+
+  .navbar:hover .link-text {
+    display: inline;
+  }
+  
+  .navbar:hover .logo i {
+    margin-left: 11rem;
+  }
+  
+  .navbar:hover .logo-text {
+    left: 0px;
+  }
+}
+
+.dark {
+  --text-primary: #b6b6b6;
+  --text-secondary: #ececec;
+  --bg-primary: #23232e;
+  --bg-secondary: #141418;
+}
+
+.light {
+  --text-primary: #1f1f1f;
+  --text-secondary: #000000;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5e5b8;
+}
+
+.solar {
+  --text-primary: #576e75;
+  --text-secondary: #35535c;
+  --bg-primary: #fdf6e3;
+  --bg-secondary: #f5e5b8;
+}
+
+.pastel {
+  --text-primary: #576e75;
+  --text-secondary: #35535c;
+  --bg-primary: #ffdbbb;
+  --bg-secondary: #f7a492;
+}
+
+.theme-icon {
+  display: none;
+}
+
+.dark #darkIcon {
+  display: block;
+}
+
+.light #lightIcon {
+  display: block;
+}
+
+.solar #solarIcon {
+  display: block;
+}
+.pastel #pastelIcon{
+  display: block;
+}
+
+
