@@ -1,22 +1,116 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods ,require_POST
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q      
+from django.http.response import JsonResponse
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
 
 from .models import Movie, Genre, Review, Comment, Oneline
 from .forms import ReviewForm, CommentForm, OnelineForm
+from .serializers import ReviewSerializer, CommentSerializer, OnelineSerializer
 
 import requests
 
+from datetime import datetime
 
+
+
+'''
+추천 알고리즘 시작
+
+################################################################
+'''
+
+
+today = ''
+weather_movies = set()
+
+
+def weather_recommand_genre_id_list():
+    # api 요청
+    params = {
+        'lat': '35.1595454',
+        'lon': '126.8526012',
+        'appid': 'fb274443560bf75e3801324989c0959e',
+        'lang': 'kr',
+    }
+    url = 'https://api.openweathermap.org/data/2.5/onecall'
+    response = requests.get(url, params=params)
+    data = response.json()
+    weather_id = str(data["current"]["weather"][0]["id"])
+    temp = data["current"]["temp"] - 273.15
+    
+    if weather_id[0] == '2':
+        genres = [80, 27, 53, 9648,]
+        # weather_id = '천둥치는'
+    elif weather_id[0] == '3':
+        genres = [80, 27, 53, 9648,]
+        # weather_id = '이슬비 내리는'
+    elif weather_id[0] == '5':
+        genres = [80, 27, 53, 9648,]
+        # weather_id = '비오는 '
+    elif weather_id[0] == '6':
+        genres = [10751, 18, 10770,]
+        # weather_id = '소복소복 눈내리는'
+    elif weather_id[0] == '7':
+        genres = [37, 10752, 878, 36, 99]
+        # weather_id = '먼지날리는'
+    elif weather_id[0] == '8':
+        # 맑은날씨
+        if weather_id[2] == '0':
+            if temp <= 0:
+                genres = [28, 12, 35, 14, 10402, 10749]
+            elif 0 < temp <= 15:
+                genres = [28, 12, 35, 14, 10402, 10749]
+            else:
+                genres = [28, 12, 35, 14, 10402, 10749]
+            # weather_id = '구름한점 없이 맑은'
+        # 흐린날씨
+        else:
+            if temp <= 0:
+                genres = [80, 27, 53, 9648,]
+            elif 0 < temp <= 15:
+                genres = [80, 27, 53, 9648,]
+            else:
+                genres = [80, 27, 53, 9648,]  
+            # weather_id = '구름이 많은'
+    return genres
+
+
+'''
+추천 알고리즘 끝
+
+################################################################
+
+영화 시작
+'''
+
+
+@login_required
 @require_http_methods(['GET'])
 def index(request):
     movies = Movie.objects.all()
+    genres = Genre.objects.all()
+
+    global today, weather_movies
+    if today != datetime.today().strftime("%Y%m%d") or (not weather_movies and genres):
+        today = datetime.today().strftime("%Y%m%d")
+        for genre_id in weather_recommand_genre_id_list():
+            weather_movies.update(set(get_object_or_404(Genre, id=genre_id).movies.all()))
+
+
     context = {
+        'weather_movies': list(weather_movies),
         'movies': movies,
+        'genres': genres,
     }
     return render(request, 'movies/index.html', context)
 
 
+@login_required
 @require_http_methods(['GET'])
 def detail(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
@@ -34,45 +128,42 @@ def detail(request, movie_id):
 리뷰 시작
 '''
 
+@login_required
 def review_list(request, movie_id):
     # articles = Article.objects.prefetch_related('like_users').select_related('user').annotate(likes=Count('like_users')).order_by('-pk')
     movie = get_object_or_404(Movie, id=movie_id)
     reviews = movie.reviews.all()
+    form = ReviewForm()
     context = {
-        'movie_id': movie_id,
+        'movie': movie,
         'reviews': reviews,
+        'form': form,
     }
     return render(request, 'movies/review/list.html', context)
 
 
-@login_required
-@require_http_methods(['GET', 'POST'])
+@api_view(['POST'])
 def review_create(request, movie_id):
-    if request.method == 'POST':
-        form = ReviewForm(request.POST) 
-        if form.is_valid():
-            review = form.save(commit=False)
-            movie = get_object_or_404(Movie, id=movie_id)
-            review.user = request.user
-            review.movie = movie
-            # review.user = request.user
-            review.save()
-            return redirect('movies:review_detail', movie_id, review.id)
-    else:
-        form = ReviewForm()
-    context = {
-        'movie_id':movie_id,
-        'form': form,
-    }
-    return render(request, 'movies/review/create.html', context)
+    if request.user.is_authenticated:
+        movie = get_object_or_404(Movie, id=movie_id)
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie=movie)
+            return Response({ 'data' : 'success!' })
+    return redirect('accounts:login')
 
 
+@login_required
 def review_detail(request, movie_id, review_id):
+    movie = get_object_or_404(Movie, id=movie_id)
     review = get_object_or_404(Review, id=review_id)
+    review_form = ReviewForm(instance=review)
     comments = review.comments.all()
     comment_form = CommentForm()
     context = {
+        'movie': movie,
         'review': review,
+        'review_form': review_form,
         'comments': comments,
         'comment_form': comment_form,
     }
@@ -80,26 +171,16 @@ def review_detail(request, movie_id, review_id):
 
 
 
-@require_http_methods(['GET', 'POST'])
+@api_view(['POST'])
 def review_update(request, movie_id, review_id):
     if request.user.is_authenticated:
-        # 수정하는 유저와, 게시글 작성 유저가 같은지 ?
         review = get_object_or_404(Review, id=review_id)
         if request.user == review.user:
-            if request.method == 'POST':
-                form = ReviewForm(request.POST, instance=review)
-                if form.is_valid():
-                    form.save()
-                    return redirect('movies:review_detail', movie_id, review_id)
-            else:
-                form = ReviewForm(instance=review)
-            context = {
-                'review':review,
-                'form': form,
-            }
-            return render(request, 'movies/review/update.html', context)
-        return redirect('movies:review_detail', movie_id, review_id)
-    return redirect('accounts:login')
+            movie = get_object_or_404(Movie, id=movie_id)
+            serializer = ReviewSerializer(data=request.data, instance=review)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user=request.user, movie=movie)
+                return Response({ 'data' : 'success!' })
 
 
 @require_POST
@@ -109,7 +190,6 @@ def review_delete(request, movie_id, review_id):
         if request.user == review.user:
             review.delete()
             return redirect('movies:review_list', movie_id)
-    return redirect('accounts:login')
 
 '''
 리뷰 끝
@@ -119,54 +199,36 @@ def review_delete(request, movie_id, review_id):
 코멘트 시작
 '''
 
-@require_POST
+@api_view(['POST'])
 def comment_create(request, movie_id, review_id):
-    # article = Article.objects.get(pk=pk)
     if request.user.is_authenticated:
         review = get_object_or_404(Review, id=review_id)
-        comments = review.comments.all()
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.review = review
-            comment.user = request.user
-            comment.save()
-            return redirect('movies:review_detail', movie_id, review_id)
-        context = {
-            'review': review,
-            'comments': comments,
-            'comment_form': comment_form,
-        }
-        return render(request, 'movies/review/detail.html', context)
-    return redirect('accounts:login')
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            comment = serializer.save(user=request.user, review=review)
+            return Response({'commentId': comment.id})
 
 
-# def comment_update(request, movie_id, review_id, comment_id):
-    # if request.user.is_authenticated:
-    # review = get_object_or_404(Review, id=review_id)
-    # comment_form = CommentForm(request.POST)
-    # comments = review.comments.all()
-    # if comment_form.is_valid():
-    #     comment = comment_form.save(commit=False)
-    #     comment.review = review
-    #     # movie_comment.user = request.user
-    #     comment.save()
-    #     return redirect('movies:review_detail', movie_id, review_id)
-    # context = {
-    #     'review': review,
-    #     'comments': comments,
-    #     'comment_form': comment_form,
-    # }
-    # return render(request, 'movies/review/detail.html', context)
+@api_view(['POST'])
+def comment_update(request, movie_id, review_id, comment_id):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, id=comment_id)
+        if request.user == comment.user:
+            review = get_object_or_404(Review, id=review_id)
+            serializer = CommentSerializer(data=request.data, instance=comment)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user=request.user, review=review)
+                return Response({'commentId': comment.id})
 
 
-@require_POST
+@api_view(['POST'])
 def comment_delete(request, movie_id, review_id, comment_id):
     if request.user.is_authenticated:
         comment = get_object_or_404(Comment, id=comment_id)
         if request.user == comment.user:
             comment.delete()
-    return redirect('movies:review_detail', movie_id, review_id)
+            return Response({'commentId': comment.id})
+
 
 '''
 코멘트 끝
@@ -179,56 +241,46 @@ def comment_delete(request, movie_id, review_id, comment_id):
 @login_required
 def oneline_list(request, movie_id):
     # articles = Article.objects.prefetch_related('like_users').select_related('user').annotate(likes=Count('like_users')).order_by('-pk')
+    form = OnelineForm()
     movie = get_object_or_404(Movie, id=movie_id)
     onelines = movie.onelines.all()
     context = {
-        'movie_id': movie_id,
+        'movie': movie,
         'onelines': onelines,
+        'form':form,
     }
     return render(request, 'movies/oneline/list.html', context)
 
 
-@login_required
-@require_http_methods(['GET', 'POST'])
-def onelinet_create(request, movie_id):
-    if request.method == 'POST':
+
+@api_view(['POST'])
+def oneline_create(request, movie_id):
+    if request.user.is_authenticated:
         movie = get_object_or_404(Movie, id=movie_id)
-        form = OnelineForm(request.POST) 
-        if form.is_valid():
-            oneline = form.save(commit=False)
+        serializer = OnelineSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie=movie)
+            
+            vote_average = movie.vote_average
+            vote_count = movie.vote_count
+
+            vote_average = (vote_average * vote_count + serializer.data.get('vote_rating', 0)) / (vote_count + 1)
+            vote_count += 1
+            Movie.objects.filter(id=movie_id).update(vote_average=vote_average, vote_count=vote_count)
+
+            return Response({ 'data' : 'success!' })
+
+
+@api_view(['POST'])
+def oneline_update(request, movie_id, oneline_id):
+    if request.user.is_authenticated:
+        oneline = get_object_or_404(Oneline, id=oneline_id)
+        if request.user == oneline.user:
             movie = get_object_or_404(Movie, id=movie_id)
-            oneline.user = request.user
-            oneline.movie = movie
-            oneline.save()
-            return redirect('movies:oneline_list', movie_id)
-    else:
-        form = OnelineForm()
-    context = {
-        'form': form,
-        'movie_id':movie_id,
-    }
-    return render(request, 'movies/oneline/create.html', context)
-
-
-# # @login_required
-# @require_http_methods(['GET', 'POST'])
-# def oneline_update(request, movie_id, oneline_id):
-#     # 수정하는 유저와, 게시글 작성 유저가 같은지 ?
-#     # if request.user == article.user:
-#     oneline = get_object_or_404(Oneline, id=oneline_id)
-#     if request.method == 'POST':
-#         form = OnelineForm(request.POST, instance=oneline)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('movies:oneline_list', movie_id, oneline_id)
-#     else:
-#         form = OnelineForm(instance=oneline)
-#     # else:
-#     #     return redirect('articles:index')
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'movies/oneline/update.html', context)
+            serializer = OnelineSerializer(data=request.data, instance=oneline)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user=request.user, movie=movie)
+                return Response({ 'data' : 'success!' })
 
 
 @require_POST
@@ -237,8 +289,8 @@ def oneline_delete(request, movie_id, oneline_id):
         oneline = get_object_or_404(Oneline, id=oneline_id)
         if request.user == oneline.user:
             oneline.delete()
-            return redirect('movies:oneline_list', movie_id)
-    return redirect('accounts:login')
+        return redirect('movies:oneline_list', movie_id)
+
 
 '''
 한줄평 끝
@@ -248,104 +300,74 @@ def oneline_delete(request, movie_id, oneline_id):
 좋아요 시작
 '''
 
-# @require_POST
-# def like(request, article_pk):
-#     # 인증된 사용자만 가능
-#     if request.user.is_authenticated:
-#         article = get_object_or_404(Article, pk=article_pk)
-#         # user가 article에 좋아요를 눌렀는지 안눌렀는지
+
+@api_view(['POST'])
+def review_like(request, movie_id, review_id):
+    if request.user.is_authenticated:
+        like_status = request.data.get('like_status')
+        user = request.user
+        review = get_object_or_404(Review, id=review_id)
+        if like_status:
+            if review.like_users.filter(id=user.id).exists():
+                review.like_users.remove(user)
+                like_status = None
+            else:
+                review.like_users.add(user)
+                if review.dislike_users.filter(id=user.id).exists():
+                    review.dislike_users.remove(user)
+        else:
+            if review.dislike_users.filter(id=user.id).exists():
+                review.dislike_users.remove(user)
+                like_status = None
+            else:
+                review.dislike_users.add(user)
+                if review.like_users.filter(id=user.id).exists():
+                    review.like_users.remove(user)
         
-#         # 1-1. user가 article을 좋아요 누른 전체유저에 포함이 되어있는지 안되어있는지.
-#         # if request.user in article.like_users.all():
+        data = {
+            'like_status':like_status,
+            'like_count':review.like_users.count(),
+            'dislike_count':review.dislike_users.count()
+        }
+        return JsonResponse(data)
+
+
+
+@api_view(['POST'])
+def oneline_like(request, movie_id, oneline_id):
+    if request.user.is_authenticated:
+        like_status = request.data.get('like_status')
+        user = request.user
+        oneline = get_object_or_404(Oneline, id=oneline_id)
+        if like_status:
+            if oneline.like_users.filter(id=user.id).exists():
+                oneline.like_users.remove(user)
+                like_status = None
+            else:
+                oneline.like_users.add(user)
+                if oneline.dislike_users.filter(id=user.id).exists():
+                    oneline.dislike_users.remove(user)
+        else:
+            if oneline.dislike_users.filter(id=user.id).exists():
+                oneline.dislike_users.remove(user)
+                like_status = None
+            else:
+                oneline.dislike_users.add(user)
+                if oneline.like_users.filter(id=user.id).exists():
+                    oneline.like_users.remove(user)
         
-#         # 1-2. user가 article을 좋아요 누른 전체유저에 존재하는지.
-#         if article.like_users.filter(pk=request.user.pk).exists():
-#             # 좋아요 취소
-#             article.like_users.remove(request.user)
-#         else:
-#             # 좋아요
-#             article.like_users.add(request.user)
-#         return redirect('articles:index')
-#     return redirect('accounts:login')
+        data = {
+            'like_status':like_status,
+            'like_count':oneline.like_users.count(),
+            'dislike_count':oneline.dislike_users.count()
+        }
+        return JsonResponse(data)
+
+
+
 
 '''
 좋아요 끝
-
-################################################################
-
-추천 알고리즘 시작
-'''
-# from django.db.models import Q      
-
-
-# host = 'https://api.openweathermap.org'
-# path = '/data/2.5/onecall'
-# params = {
-#     'lat': '35.1595454',
-#     'lon': '126.8526012',
-#     'appid': 'fb274443560bf75e3801324989c0959e',
-#     'lang': 'kr',
-# }
-# url = host + path
-
-
-# @require_GET
-# def recommended(request):
-#     # api 요청
-#     response = requests.get(url, params=params)
-#     data = response.json()
-#     weather_id = str(data["current"]["weather"][0]["id"])
-#     temp = data["current"]["temp"] - 273.15
-    
-#     if weather_id[0] == '2':
-#         genre = ['53', '27', '9648']
-#         weather_id = '천둥치는'
-#     elif weather_id[0] == '3':
-#         genre = ['10749', '18', '10402']
-#         weather_id = '이슬비 내리는'
-#     elif weather_id[0] == '5':
-#         genre = ['53', '10770', '99']
-#         weather_id = '비오는 '
-#     elif weather_id[0] == '6':
-#         genre = ['10749', '18', '35']
-#         weather_id = '소복소복 눈내리는'
-#     elif weather_id[0] == '7':
-#         genre = ['12', '9648', '14']
-#         weather_id = '먼지날리는'
-#     elif weather_id[0] == '8':
-#         # 맑은날씨
-#         if weather_id[2] == '0':
-#             if temp <= 0:
-#                 genre = ['99', '80', '37']
-#             elif 0 < temp <= 15:
-#                 genre = ['35', '36', '10402']
-#             else:
-#                 genre = ['53', '27', '9648']
-#             weather_id = '구름한점 없이 맑은'
-#         # 흐린날씨
-#         else:
-#             if temp <= 0:
-#                 genre = ['10770', '12', '10402']
-#             elif 0 < temp <= 15:
-#                 genre = ['10752', '99', '36']
-#             else:
-#                 genre = ['14', '28', '878']  
-#             weather_id = '구름이 많은'
-    
-
-#     # 조건문에 따른 필터링 (id, temp를 활용)
-
-#     movies = Movie.objects.filter(Q(genres=genre[0]) | Q(genres=genre[1]) | Q(genres=genre[2]))
-#     context = {
-#         'movies': movies,
-#         'weather_id': weather_id,
-#         'temp': temp
-#     }
-#     return render(request, 'movies/recommended.html', context)
-
-
-'''
-추천 알고리즘 끝
 
 ################################################################
 
@@ -443,7 +465,7 @@ def tmdb(request):
         genre_instance.save()
 
     # TMDB API를 활용하여 1 ~ 21 페이지에 해당하는 영화 정보 추출
-    for page in range(1, 21):
+    for page in range(1, 51):
         payload = {
             'api_key': '7571218b4ab42912852227b3b4ea629c',
             'language': 'ko-KR',
@@ -491,4 +513,10 @@ def tmdb(request):
                 genre_instance.movies.add(movie_instance)
 
 
-    return render(request, 'movies/data.html')
+    # 날씨별 영화추천 초기화
+    global today, weather_movies
+    today = datetime.today().strftime("%Y%m%d")
+    for genre_id in weather_recommand_genre_id_list():
+        weather_movies.update(set(get_object_or_404(Genre, id=genre_id).movies.all()))
+
+    return redirect('accounts:signup')

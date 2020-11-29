@@ -1,14 +1,211 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/oneline_review.css' %}">
+{% endblock %}
+
+
 {% block content %}
-  <h1 class="text-center">리뷰 게시판</h1>
-  <a href="{% url 'movies:review_create' movie_id %}">리뷰 작성</a>
-  <hr>
-  {% for review in reviews %}
-    <a href="{% url 'movies:review_detail' movie_id review.id %}">
-      <h3>{{ review.title }}</h3>
-      <p>{{ review.content }}</p>
-    </a>
-  {% endfor %}
-  <a href="{% url 'movies:index'%}">back</a>
+<main>
+  <div class="container">
+    <div><h1 class="text-light">리뷰</h1></div>
+    <!-- 리뷰 작성 버튼 / 뒤로가기 버튼 -->
+    <div class="row justify-content-end mb-3">
+      <button style="background-color:#590707; color:white;" type="button" class="btn mr-3 " data-toggle="modal" data-target="#createModal">
+        <span>글작성<i class="fas fa-pen"></i></span>
+      </button>
+      <a href="{% url 'movies:index' %}">
+      <button style="background-color:#590707; color:white;" type="button" class="btn mr-3 ">
+        <span>뒤로가기</span>
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      </a>
+    </div>
+
+    <div style="border-radius:10px;" class="bg-light">
+      {% if reviews %}
+      <ul class="score_result p-3">
+        {% for review in reviews %}
+          <li>
+            <div class="review_content">
+              <h3>
+                <a href="{% url 'movies:review_detail' movie.id review.id %}">
+                  {{ review.title }}
+                </a>
+              </h3>
+              <p>{{ review.content }}</p>
+              <dl class="row justify-content-end mr-3">
+                <dt>
+                  <em><span>{{ review.user }} | </span></em>
+                  <em>{{ review.created }}</em>
+                </dt>
+              </dl>
+            </div>
+            
+            <div class="m-1 row justify-content-end">
+              <button style="background-color:#4568ff; color:#ffffff" id="review-like-button" class="btn mr-1" data-review-id="{{ review.id }}">
+                {% if user in review.like_users.all %}
+                  <i id="thumbs-up-{{ review.id }}" class="fas fa-thumbs-up">{{ review.like_users.count }}</i>
+                {% else %}
+                  <i id="thumbs-up-{{ review.id }}" class="far fa-thumbs-up">{{ review.like_users.count }}</i>
+                {% endif %}
+              </button>
+              <button style="background-color:#da0015; color:#ffffff" id="review-dislike-button" class="btn" data-review-id="{{ review.id }}">
+                {% if user in review.dislike_users.all %}
+                  <i id="thumbs-down-{{ review.id }}" class="fas fa-thumbs-down">{{ review.dislike_users.count }}</i>
+                {% else %}
+                  <i id="thumbs-down-{{ review.id }}" class="far fa-thumbs-down">{{ review.dislike_users.count }}</i>
+                {% endif %}
+              </button>
+            </div>
+            <hr style="border-top:3px dotted;">
+          </li>
+
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">리뷰 작성</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="" method="POST">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <div class="modal-footer">
+                <button style="background-color:#590707;" id="create-button" type="button" class="btn btn-primary">글쓰기</button>
+                <button type="button" class="btn btn-dark" data-dismiss="modal">닫기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block script %}
+  <script>
+    // 리뷰 생성 모달(AJAX 통신)
+    const BASE_URL = `http://127.0.0.1:8000/movies/{{movie.id}}/review`
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    
+    const createButton = document.querySelector('#create-button')
+    createButton.addEventListener('click', function(e) {
+      e.preventDefault()
+
+      const title = document.querySelector('input[name=title]').value
+      const content = document.querySelector('textarea[name=content]').value
+      const url = `${BASE_URL}/create/`
+      
+      axios({
+        url: url,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          title: title, 
+          content: content,
+        }
+      })
+      .then(res => {
+        console.log(res)
+        window.location.reload()
+      })
+      .catch(err => {
+        console.log(err)
+        alert('글을 작성해주세요.')
+      })
+
+    })
+
+
+    // 리뷰 좋아요 버튼
+    const reviewLikeButtons = document.querySelectorAll('#review-like-button')
+    reviewLikeButtons.forEach(reviewLikeButton => {
+      reviewLikeButton.addEventListener('click', e => {
+        e.preventDefault()
+        const reviewId = e.target.dataset.reviewId
+        const URL=`${BASE_URL}/${reviewId}/like/`
+        axios({
+        url: URL,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          like_status: true,
+        },
+        })
+        .then(res => {
+          console.log(res)
+          const { like_status, like_count, dislike_count } = res.data
+          const faThumbsUp = document.querySelector(`#thumbs-up-${ reviewId }`)
+          const faThumbsDown = document.querySelector(`#thumbs-down-${ reviewId }`)
+          if (like_status) {
+            faThumbsUp.classList.add('fas')
+            faThumbsUp.classList.remove('far')
+
+            faThumbsDown.classList.add('far')
+            faThumbsDown.classList.remove('fas')
+          } else {
+            faThumbsUp.classList.add('far')
+            faThumbsUp.classList.remove('fas')
+          }
+          faThumbsUp.innerText = like_count
+          faThumbsDown.innerText = dislike_count
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      })
+    })
+    
+    
+    // 리뷰 싫어요 버튼
+    const reviewDislikeButtons = document.querySelectorAll('#review-dislike-button')
+    reviewDislikeButtons.forEach(reviewDislikeButton => {
+      reviewDislikeButton.addEventListener('click', e => {
+        e.preventDefault()
+        const reviewId = e.target.dataset.reviewId
+        const URL=`${BASE_URL}/${reviewId}/like/`
+        axios({
+        url: URL,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          like_status: false,
+        },
+        })
+        .then(res => {
+          console.log(res)
+          const { like_status, like_count, dislike_count } = res.data
+          const faThumbsUp = document.querySelector(`#thumbs-up-${ reviewId }`)
+          const faThumbsDown = document.querySelector(`#thumbs-down-${ reviewId }`)
+          if (like_status === false) {
+            faThumbsDown.classList.add('fas')
+            faThumbsDown.classList.remove('far')
+
+            faThumbsUp.classList.add('far')
+            faThumbsUp.classList.remove('fas')
+          } else {
+            faThumbsDown.classList.add('far')
+            faThumbsDown.classList.remove('fas')
+          }
+          faThumbsUp.innerText = like_count
+          faThumbsDown.innerText = dislike_count
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      })
+    })
+  </script>
 {% endblock %}

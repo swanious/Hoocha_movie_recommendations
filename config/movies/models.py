@@ -13,20 +13,11 @@ class Movie(models.Model):
     release_date = models.DateField()
     original_language = models.CharField(max_length=2)
     original_title = models.CharField(max_length=100)
-    backdrop_path = models.TextField(blank=True)
+    backdrop_path = models.TextField(blank=True, null=True)
     adult = models.BooleanField(default=False)
     overview = models.TextField()
     poster_path = models.TextField()
     
-    watch_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='watch_movies', through='History')
-    
-    
-class History(models.Model):
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
 
 class Genre(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -38,6 +29,7 @@ class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
+    dislike_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='dislike_reviews')
 
     title = models.CharField(max_length=50)
     content = models.TextField()
@@ -58,10 +50,9 @@ class Oneline(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='onelines')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_onelines')
+    dislike_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='dislike_onelines')
 
     vote_rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], default=0)
     content = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    
-

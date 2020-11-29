@@ -1,11 +1,15 @@
 
 a.no-uline { text-decoration:none }
 
+.carousel-control-next, 
+.carousel-control-prev {
+  width: 10% !important;
+}
 
 /* modal header */
 
 .modal-header {
-  background-color: #b10904;
+  background-color: #590707;
 }
 
 .modal-header .modal-title {
@@ -22,7 +26,7 @@ a.no-uline { text-decoration:none }
 }
 
 .close-button {
-  background-color: #d60d06;
+  background-color: #590707;
   font-weight: bold;
   color: white
 }
@@ -103,6 +107,12 @@ a.no-uline { text-decoration:none }
   width: 2rem;
   min-width: 2rem;
   margin: 0 1.5rem;
+}
+
+.modal-nav-link:hover {
+  filter: grayscale(0%) opacity(1);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
 }
 
 .modal-navbar:hover {

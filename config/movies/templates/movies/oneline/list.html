@@ -1,18 +1,325 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/oneline_review.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1 class="text-center">평점</h1>
-  <a href="{% url 'movies:oneline_create' movie_id %}">한줄평 작성</a>
-  {% for oneline in onelines %}
-    <div class="mt-3 row align-content-center">
-      <p>{{ oneline.vote_rating }}</p>
-      <p>{{ oneline.content }}</p>
-      <form action="{% url 'movies:oneline_delete' oneline.movie.id oneline.id %}" method="POST">
-        {% csrf_token %}
-        <button>DELETE</button>
-      </form>
+  <main>
+    <div class="container">
+      <div><h1 class="text-light">한줄평</h1></div>
+      <div class="row justify-content-end mb-3">
+        <button style="background-color:#590707; color:white;"  type="button" class="oneline-create btn mr-3" data-toggle="modal" data-target="#createModal">
+          <span>글작성</span>
+          <i class="fas fa-pen"></i>
+        </button>
+        <a href="{% url 'movies:index' %}">
+          <button style="background-color:#590707; color:white;" type="button" class="btn mr-3 ">
+            <span>뒤로가기</span>
+            <i class="fas fa-arrow-left"></i>
+          </button>
+        </a>
+      </div>
+      <div style="border-radius:10px;" class="bg-light">
+        {% if onelines %}
+        <ul class="score_result p-3">
+          {% for oneline in onelines %}
+            <li class="row">
+              <div class="col-2">
+                {% if 1 <=  oneline.vote_rating and oneline.vote_rating <= 2 %}
+                  <span>★☆☆☆☆</span>
+                {% elif 3 <=  oneline.vote_rating and oneline.vote_rating <= 4 %}
+                  <span>★★☆☆☆</span>
+                {% elif 5 <=  oneline.vote_rating and oneline.vote_rating <= 6 %}
+                  <span>★★★☆☆</span>
+                {% elif 7 <=  oneline.vote_rating and oneline.vote_rating <= 8 %}
+                  <span>★★★★☆</span>
+                {% else %}
+                  <span>★★★★★</span>
+                {% endif %}
+                <span><em>{{ oneline.vote_rating }}</em></span>
+              </div>
+              <div class="col-6">
+                <span>{{ oneline.content }}</span>
+                <dl>
+                  <dt>
+                    <em><span>{{ oneline.user }} | </span></em>
+                    <em>{{ oneline.created }}</em>
+                  </dt>
+                </dl>
+              </div>
+              {% if request.user == oneline.user %}
+              <div class="col-2">
+                <div class="row">
+                  <!-- 한줄평 수정버튼 -->
+                  <form action="{% url 'movies:oneline_delete' oneline.movie.id oneline.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="button" data-toggle="modal" data-target="#updateModal{{ oneline.id }}">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </form>
+                  <!-- 한줄평 삭제버튼 -->
+                  <form action="{% url 'movies:oneline_delete' oneline.movie.id oneline.id %}" method="POST">
+                    {% csrf_token %}
+                    <button>
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+              {% endif %}
+              <div class="col-2">
+                <button id="oneline-like-button" class="btn btn-primary" data-oneline-id="{{ oneline.id }}">
+                  {% if user in oneline.like_users.all %}
+                    <i id="thumbs-up-{{ oneline.id }}" class="fas fa-thumbs-up">{{ oneline.like_users.count }}</i>
+                  {% else %}
+                    <i id="thumbs-up-{{ oneline.id }}" class="far fa-thumbs-up">{{ oneline.like_users.count }}</i>
+                  {% endif %}
+                </button>
+                <button id="oneline-dislike-button" class="btn btn-danger" data-oneline-id="{{ oneline.id }}">
+                  {% if user in oneline.dislike_users.all %}
+                    <i id="thumbs-down-{{ oneline.id }}" class="fas fa-thumbs-down">{{ oneline.dislike_users.count }}</i>
+                  {% else %}
+                    <i id="thumbs-down-{{ oneline.id }}" class="far fa-thumbs-down">{{ oneline.dislike_users.count }}</i>
+                  {% endif %}
+                </button>
+              </div>
+
+              <hr style="border-top:3px dotted;">
+            </li>
+            <hr>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
     </div>
-    <hr>
+  </main>
+<hr>
+
+
+
+
+
+  <!-- Create Modal -->
+  <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">한줄평 작성</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form action="" method="POST">
+              {% csrf_token %}
+              {% for field in form %} 
+                <div class="form-group m-3">
+                  <span>{{ field.errors }}</span>
+                  <span class="">{{ field.label }}</span>
+                  <span>{{ field }}</span>
+                </div>
+              {% endfor %}
+              <div class="container">
+                <div class="row justify-content-end p-3">
+                  <button style="background-color:#590707" id="create-button" type="button" class="btn btn-primary">저장</button>
+                  <button type="button" class="btn btn-dark ml-1" data-dismiss="modal">닫기</button>
+                </div>
+              </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Modal -->
+  {% for oneline in onelines %}
+    <div class="modal fade" id="updateModal{{ oneline.id }}" tabindex="-1" aria-labelledby="updateModalLabel{{ oneline.id }}" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateModalLabel{{ oneline.id }}">한줄평 수정</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body mt-3">
+            <form action="" method="POST" id="{{ oneline.id }}">
+              {% csrf_token %}
+              <label for="update-content-{{ oneline.id }}">한줄평</label>
+              <input id="update-content-{{ oneline.id }}" value="{{ oneline.content }}" class="form-control" type="text" placeholder="Default input">
+              <br>
+              <label for="update-vote-rating-{{ oneline.id }}">평점 </label>
+              <select class="custom-select mb-3" id="update-vote-rating-{{ oneline.id }}">
+                <option selected disabled >{{ oneline.vote_rating }}</option>
+                <option value="10">10</option>
+                <option value="9">9</option>
+                <option value="8">8</option>
+                <option value="7">7</option>
+                <option value="6">6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+              </select>
+              <hr>
+              <input id="update-button" type="submit" class="btn btn-secondary" value="저장">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   {% endfor %}
-  <a href="{% url 'movies:detail' movie_id %}">BACK</a>
+
+{% endblock %}
+
+
+{% block script %}
+  <script>
+    // 한줄평 생성 버튼
+    const BASE_URL = `http://127.0.0.1:8000/movies/{{movie.id}}/oneline`
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    
+    const createButton = document.querySelector('#create-button')
+    createButton.addEventListener('click', function(e) {
+      e.preventDefault()
+      const content = document.querySelector('input[name=content]').value
+      const vote_rating = document.querySelector('select[name=vote_rating]').value
+      const url = `${BASE_URL}/create/`
+      
+      axios({
+        url: url,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          content: content,
+          vote_rating: vote_rating 
+        }
+      })
+      .then(res => {
+        console.log(res)
+        window.location.reload()
+      })
+      .catch(err => {
+        console.log(err)
+        alert('글을 작성해주세요.')
+      })
+
+    })
+
+    // 한줄평 수정 버튼
+    const updateButtons = document.querySelectorAll('#update-button')
+    updateButtons.forEach(updateButton => {
+      updateButton.addEventListener('click', function (e) {
+        e.preventDefault()
+
+        const onelineId = e.target.parentElement.id
+        const content = document.querySelector(`#update-content-${onelineId}`).value
+        const vote_rating = document.querySelector(`#update-vote-rating-${onelineId}`).value
+        const url = `${BASE_URL}/${onelineId}/update/`
+
+        axios({
+          url: url,
+          method: 'post',
+          headers: { 'X-CSRFToken': csrftoken },
+          data: {
+            content: content,
+            vote_rating: vote_rating 
+          },
+        })
+        .then(res => {
+          console.log(res)
+          window.location.reload()
+        })
+        .catch(err => {
+          console.log(err)
+          alert('글을 작성해주세요.')
+        })
+      })
+    })
+
+    // 좋아요 버튼
+    const onelineLikeButtons = document.querySelectorAll('#oneline-like-button')
+    onelineLikeButtons.forEach(onelineLikeButton => {
+      onelineLikeButton.addEventListener('click', e => {
+        e.preventDefault()
+        const onelineId = e.target.dataset.onelineId
+        const URL=`${BASE_URL}/${onelineId}/like/`
+        axios({
+        url: URL,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          like_status: true,
+        },
+        })
+        .then(res => {
+          console.log(res)
+          const { like_status, like_count, dislike_count } = res.data
+          const faThumbsUp = document.querySelector(`#thumbs-up-${onelineId}`)
+          const faThumbsDown = document.querySelector(`#thumbs-down-${onelineId}`)
+          if (like_status) {
+            faThumbsUp.classList.add('fas')
+            faThumbsUp.classList.remove('far')
+
+            faThumbsDown.classList.add('far')
+            faThumbsDown.classList.remove('fas')
+          } else {
+            faThumbsUp.classList.add('far')
+            faThumbsUp.classList.remove('fas')
+          }
+          faThumbsUp.innerText = like_count
+          faThumbsDown.innerText = dislike_count
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      })
+    })
+    
+    
+    // 싫어요 버튼
+    const onelineDislikeButtons = document.querySelectorAll('#oneline-dislike-button')
+    onelineDislikeButtons.forEach(onelineDislikeButton => {
+      onelineDislikeButton.addEventListener('click', e => {
+        e.preventDefault()
+        const onelineId = e.target.dataset.onelineId
+        const URL=`${BASE_URL}/${onelineId}/like/`
+        axios({
+        url: URL,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          like_status: false,
+        },
+        })
+        .then(res => {
+          console.log(res)
+          const { like_status, like_count, dislike_count } = res.data
+          const faThumbsUp = document.querySelector(`#thumbs-up-${onelineId}`)
+          const faThumbsDown = document.querySelector(`#thumbs-down-${onelineId}`)
+          if (like_status === false) {
+            faThumbsDown.classList.add('fas')
+            faThumbsDown.classList.remove('far')
+
+            faThumbsUp.classList.add('far')
+            faThumbsUp.classList.remove('fas')
+          } else {
+            faThumbsDown.classList.add('far')
+            faThumbsDown.classList.remove('fas')
+          }
+          faThumbsUp.innerText = like_count
+          faThumbsDown.innerText = dislike_count
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      })
+    })
+  </script>
 {% endblock %}

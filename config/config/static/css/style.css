@@ -18,8 +18,6 @@
   content: ""; 
   } */
 
-
-
 :root {
   font-size: 16px;
   font-family: 'Open Sans';
@@ -41,22 +39,7 @@ body{
   height: 100%;
   position: relative;
   overflow: auto;
-  background-color: var(--bg-secondary);
-}
-
-body::after {
-  position: absolute; 
-  top: 0; 
-  left: 0; 
-  right: 0; 
-  bottom: 0; 
-  background: url('../backgroundimages/image.png');
-  opacity: 0.5;
-  background-repeat : no-repeat;
-  background-size: cover; 
-  overflow: auto;
-  z-index: -1;
-  content: "";
+  background-color: #25261F;
 }
 
 body::-webkit-scrollbar {
@@ -72,6 +55,14 @@ body::-webkit-scrollbar-thumb {
   background-color: #370604;
 }
 
+footer {
+  width: auto;
+  position: absolute;
+  top: 0;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
 /* 
   list-style은 ul, ol, li요소에 주는 스타일
   flex-direction을 column으로 주면 요소가 열순서로 바뀜
@@ -84,7 +75,10 @@ main {
 }
 
 .navbar {
-  z-index: 10;
+  top: 0;
+  width: 5rem;
+  height: 100%;
+  z-index: 2;
   padding: 0;
   position: fixed;
   background-color: var(--bg-primary);
@@ -92,6 +86,21 @@ main {
   overflow: hidden;
 }
 
+.navbar:hover {
+  width: 16rem;
+}
+
+.navbar:hover .link-text {
+  display: inline;
+}
+
+.navbar:hover .logo i {
+  margin-left: 11rem;
+}
+
+.navbar:hover .logo-text {
+  left: 0px;
+}
 
 .navbar-nav {
   list-style: none;
@@ -132,6 +141,8 @@ main {
   min-width: 2rem;
   margin: 0 1.5rem;
 }
+
+
 
 /* 
   mouseover할 경우 동작
@@ -187,57 +198,6 @@ main {
   transition: var(--transition-speed);
 }
 
-
-@media only screen and (max-width: 600px) {
-  
-  .navbar {
-    top: 0;
-    width: 100vw;
-    height: 5rem;
-  }
-
-  .logo {
-    display: none;
-  }
-
-  .navbar-nav {
-    flex-direction: row;
-  }
-  
-  .nav-link {
-    justify-content: center;
-  }
-  
-  main {
-    margin: 0;
-  }
-
-}
-
-@media only screen and (min-width: 600px) {
-  .navbar {
-    top: 0;
-    width: 5rem;
-    height: 100%;
-  }
-
-  .navbar:hover {
-    width: 16rem;
-  }
-
-  .navbar:hover .link-text {
-    display: inline;
-  }
-  
-  .navbar:hover .logo i {
-    margin-left: 11rem;
-  }
-  
-  .navbar:hover .logo-text {
-    left: 0px;
-  }
-}
-
 .dark {
   --text-primary: #b6b6b6;
   --text-secondary: #ececec;
@@ -249,21 +209,14 @@ main {
   --text-primary: #1f1f1f;
   --text-secondary: #000000;
   --bg-primary: #ffffff;
-  --bg-secondary: #f5e5b8;
+  --bg-secondary: #D94E73;
 }
 
-.solar {
-  --text-primary: #576e75;
-  --text-secondary: #35535c;
-  --bg-primary: #fdf6e3;
-  --bg-secondary: #f5e5b8;
-}
-
-.pastel {
-  --text-primary: #576e75;
-  --text-secondary: #35535c;
-  --bg-primary: #ffdbbb;
-  --bg-secondary: #f7a492;
+.film {
+  --text-primary: #b6b6b6;
+  --text-secondary: #ececec;
+  --bg-primary: #260202;
+  --bg-secondary: #400E12;
 }
 
 .theme-icon {
@@ -278,10 +231,7 @@ main {
   display: block;
 }
 
-.solar #solarIcon {
-  display: block;
-}
-.pastel #pastelIcon{
+.film #filmIcon{
   display: block;
 }
 

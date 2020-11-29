@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block authentication_style %}
-  <link rel="stylesheet" href="{% static 'css/authentication_style.css' %}">
+{% block style %}
+  <link rel="stylesheet" href="{% static 'css/signup_and_login.css' %}">
 {% endblock  %}
 
 
@@ -12,18 +12,18 @@
     <div class="col-2"></div>
     <div class="col-xs-12 col-md-8">
       <div class="login-box">
-        <h1 class="text-monospace">로그인</h1>
+        <h1 class="text-light">로그인</h1>
         <form class="d-flex flex-column" action="" method="POST">
           {% csrf_token %}
           {% for field in form %} 
-            <div class="form-group">
+            <div class="form-group m-3">
               <span>{{ field.errors }}</span>
-              {{ field.label }}
-              {{ field }}
+              <span class="text-light">{{ field.label }}</span>
+              <span>{{ field }}</span>
             </div>
           {% endfor %}
           <br>
-          <input class="login-button btn mt-3" type="submit">
+          <input class="login-button btn mt-3 m-3" type="submit">
         </form>
       </div>
     </div>

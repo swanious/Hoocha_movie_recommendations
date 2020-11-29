@@ -3,39 +3,85 @@
 {% load customtag %}
 
 <!-- css -->
-{% block modal %}
+{% block style %}
   <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 {% endblock %}
 
 <!-- content -->
 {% block content %}
+
+  <!-- 날씨별 -->
+  <main>
+  
+  {% if weather_movies %}
+  <h2 class="mt-5 text-light">날씨별 영화 추천</h2>
   <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel" data-interval="5000">
-      <div class="carousel-inner text-center">
-      <!-- movie slide -->
-        {% for movieList in movies|customMovieList %}
-          <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">          
-            {% for movie in movieList %}
-              <a data-toggle="modal" data-target="#staticBackdrop{{ movie.id }}">
-                <img class="movie-image col-sm-4 col-md-2" src="{{ movie.poster_path }}" alt="{{ movie.title }}">
-              </a>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      </div>
+    <div class="carousel-inner text-center">
+    <!-- movie slide -->
+      {% for movieList in weather_movies|customMovieList %}
+        <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">          
+          {% for movie in movieList %}
+            <a data-toggle="modal" data-target="#staticBackdrop{{ movie.id }}">
+              <img class="movie-image col-sm-4 col-md-2" src="{{ movie.poster_path }}" alt="{{ movie.title }}">
+            </a>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
 
-      <!-- carousel button -->
-      <a class="carousel-control-prev" href="#carouselExampleFade" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#carouselExampleFade" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
+    <!-- carousel button -->
+    <a class="sibal carousel-control-prev" href="#carouselExampleFade" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselExampleFade" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
   </div>
+  {% endif %}
+ 
+  <!-- 날씨별 -->
 
-  {% for movie in movies %}
-    {% include 'movies/_detail_modal.html' %}
+  <!-- 장르별 -->
+  {% for genre in genres %}
+    {% with genre_movies=genre.movies.all  %}
+     {% if genre_movies|length %}
+      <h2 class="mt-5 text-light">{{ genre.name }}</h2>
+
+      <div id="carousel-{{ genre.id }}" class="carousel slide carousel-fade" data-ride="carousel" data-interval="5000">
+        <div class="carousel-inner text-center">
+        <!-- movie slide -->
+          {% for movieList in genre_movies|customMovieList %}
+            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">          
+              {% for movie in movieList %}
+                <a data-toggle="modal" data-target="#staticBackdrop{{ movie.id }}">
+                  <img class="movie-image col-sm-4 col-md-2" src="{{ movie.poster_path }}" alt="{{ movie.title }}">
+                </a>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- carousel button -->
+        <a class="carousel-control-prev" href="#carousel-{{ genre.id }}" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carousel-{{ genre.id }}" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+     {% endif %}
+    {% endwith %}
   {% endfor %}
+  <!-- 장르별 끝 -->
+ </main>
+
+
+{% for movie in movies %}
+  {% include 'movies/_detail_modal.html' %}
+{% endfor %}
 
 {% endblock content %}

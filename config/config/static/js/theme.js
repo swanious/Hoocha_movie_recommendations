@@ -1,8 +1,7 @@
 const themeMap = {
+  film: "dark",
   dark: "light",
-  light: "solar",
-  solar: "pastel",
-  pastel: "dark",
+  light: "film",
 };
 
 const theme = localStorage.getItem('theme')

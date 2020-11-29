@@ -1,41 +1,276 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>리뷰</h1>
-  <p>{{ review.content }}</p>
 
-  <!-- review_update -->
-  <a href="{% url 'movies:review_update' review.movie.id review.id %}">UPDATE</a>
-  
-  <!-- review_delete -->
-  <form action="{% url 'movies:review_delete' review.movie.id review.id %}" method="POST">
-    {% csrf_token %}
-    <button>DELETE</button>
-  </form>
+<main>
+<div class="container">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <div><h1 class="display-4">상세리뷰</h1></div>
+      <div class="row justify-content-end mb-3">
+        <a href="{% url 'movies:index' %}">
+          <button style="background-color:#590707; color:white;" type="button" class="btn mr-3 ">
+            <span>뒤로가기</span>
+            <i class="fas fa-arrow-left"></i>
+          </button>
+        </a>
+      </div>
+
+      <p class="lead">작성자 : {{ review.user.username }}</p>
+      <p class="lead">글제목 : {{ review.title }}</p>
+      <p class="lead">글내용 : {{ review.content }}</p>
+      <p class="lead">작성일 : {{ review.created }}</p>
+      <p class="lead">수정일 : {{ review.updated }}</p>
+    </div>
+    {% if user == review.user %}
+    <div class="row ml-1">
+      <!-- review_update -->
+      <button style="background-color:#590707; color:white;"  type="button" class="oneline-create btn ml-3 mr-3" data-toggle="modal" data-target="#updateModal">
+        <span>글 수정</span>
+        <i class="fas fa-pen"></i>
+      </button>
+      
+      <!-- review_delete -->
+      <form action="{% url 'movies:review_delete' review.movie.id review.id %}" method="POST">
+        {% csrf_token %}
+        <button style="background-color:red;" class="btn btn-danger">삭제</button>
+      </form>
+    {% endif %}
+    </div>
+  </div>
+
+
+  <!-- update Modal -->
+  <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div style="background-color:#590707;" class="modal-header">
+          <h5 style="color:white;" class="modal-title" id="exampleModalLabel">리뷰 수정</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+            <h1 class="text-center">리뷰</h1>
+            <form id="review-update-form" action="" method="POST">
+              {% csrf_token %}
+              {{ review_form.as_p }}
+              <div class="modal-footer">
+                <button style="background-color:#590707;" type="button" class="btn btn-primary" id="review-update-button">수정</button>
+                <button type="button" class="btn btn-dark" data-dismiss="modal">닫기</button>
+              </div>
+            </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <hr>
 
   <!-- comment create -->
-  <h1>댓글 작성</h1>
-  <form action="{% url 'movies:comment_create' review.movie.id review.id %}" method="POST">
+  <h1 class="text-light">댓글 작성</h1>
+  <form class="text-light" id="comment-create-form" action="{% url 'movies:comment_create' review.movie.id review.id %}" method="POST">
     {% csrf_token %}
-    <div class="ml-1 row align-content-center">
-      <span>{{ comment_form }}</span>
-      <span><input type="submit"></span>
-    </div>
+      {{ comment_form }}
+      <input id="comment-create-button" type="submit">
   </form>
-
   <hr>
 
+  <h1 class="text-light">댓글</h1>
+  <div id="comment-list">
+    {% for comment in comments %}
+      <div id="comment-div-{{ comment.id }}" data-comment-id="{{ comment.id }}">
+        <span class="text-light">{{ comment.content }}</span>
+        {% if user == comment.user %}
+          <button id="comment-update-button">수정</button>
+          <button id="comment-delete-button">삭제</button>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+</main>
+{% endblock %}
 
-  <h1>댓글</h1>
-  {% for comment in comments %}
-    <p>{{ comment.content }}</p>
-    <!-- comment delete -->
-    <form action="{% url 'movies:comment_delete' review.movie.id review.id comment.id %}" method="POST">
-      {% csrf_token %}
-      <button>DELETE</button>
-    </form>
-  {% endfor %}
-  <a href="{% url 'movies:review_list' review.movie.id %}">[back]</a>
+
+{% block script %}
+  <script>
+
+    const BASE_URL = `http://127.0.0.1:8000/movies/{{movie.id}}/review`
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    
+    // review update
+    const reviewUpdateButton = document.querySelector('#review-update-button')
+    reviewUpdateButton.addEventListener('click', function (e) {
+      e.preventDefault()
+
+      const title = document.querySelector('input[name=title]').value
+      const content = document.querySelector('textarea[name=content]').value
+      const url = `${BASE_URL}/{{review.id}}/update/`
+
+      axios({
+        url: url,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          title: title, 
+          content: content,
+        }
+      })
+      .then(res => {
+        console.log(res)
+        window.location.reload()
+      })
+      .catch(err => {
+        console.log(err)
+        alert('글을 작성해주세요.')
+      })
+
+    })
+  
+
+    // comment
+    const commentsList = document.querySelector('#comment-list')
+    
+    // comment delete
+    function setCommentDelete(commentDeleteButton) {
+      commentDeleteButton.addEventListener('click', e => {
+        const commentId = e.target.parentElement.dataset.commentId
+        const url = `${BASE_URL}/{{review.id}}/comment/${commentId}/delete/`
+
+        axios({
+          url: url,
+          method: 'post',
+          headers: { 'X-CSRFToken': csrftoken },
+        })
+        .then(res => {
+          console.log(res)
+          const commmentDiv = document.querySelector(`#comment-div-${commentId}`)
+          commentsList.removeChild(commmentDiv)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      })
+    }
+  
+    const commentDeleteButtons = document.querySelectorAll('#comment-delete-button')
+    commentDeleteButtons.forEach(commentDeleteButton => {
+      setCommentDelete(commentDeleteButton)
+    })
+
+    // comment update
+    function setCommentUpdate(commentUpdateButton) {
+      commentUpdateButton.addEventListener('click', e => {
+        const commentId = e.target.parentElement.dataset.commentId
+        const url = `${BASE_URL}/{{review.id}}/comment/${commentId}/update/`
+        // 기존의 태그들
+        const commmentDiv = document.querySelector(`#comment-div-${commentId}`)
+        const commentSpan = document.querySelector(`#comment-div-${commentId} > span`)
+        const commentUpdateButton = document.querySelector(`#comment-div-${commentId} > #comment-update-button`)
+        const commentDeleteButton = document.querySelector(`#comment-div-${commentId} > #comment-delete-button`)
+
+        // 새로운 태그들
+        const commentUpdateInput = document.createElement('input')
+        commentUpdateInput.type = 'text'
+        commentUpdateInput.value = commentSpan.innerText
+
+        const commentUpdateCompleteButton = document.createElement('button')
+        commentUpdateCompleteButton.innerText = '완료'
+        commentUpdateCompleteButton.addEventListener('click', e => {
+          const content = commentUpdateInput.value
+
+          // 업데이트
+          axios({
+            url: url,
+            method: 'post',
+            headers: { 'X-CSRFToken': csrftoken },
+            data: {
+              content: content,
+            }
+          })
+          .then(res => {
+            console.log(res)
+            // 업데이트
+            commentSpan.innerText = content
+            // 복구
+            commmentDiv.innerHTML = ''
+            commmentDiv.append(commentSpan, commentUpdateButton, commentDeleteButton)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        })
+
+        const commentUpdateCancelButton = document.createElement('button')
+        commentUpdateCancelButton.innerText = '취소'
+        commentUpdateCancelButton.addEventListener('click', e => {
+          // 복구
+          commmentDiv.innerHTML = ''
+          commmentDiv.append(commentSpan, commentUpdateButton, commentDeleteButton)
+        })
+
+        // 새로운 태그들 추가
+        commmentDiv.innerHTML = ''
+        commmentDiv.append(commentUpdateInput, commentUpdateCompleteButton, commentUpdateCancelButton)
+      })
+    }
+  
+    const commentUpdateButtons = document.querySelectorAll('#comment-update-button')
+    commentUpdateButtons.forEach(commentUpdateButton => {
+      setCommentUpdate(commentUpdateButton)
+    })
+
+    const commentCreateButton = document.querySelector('#comment-create-button')
+    commentCreateButton.addEventListener('click', function (e) {
+      e.preventDefault()
+
+      const commentInput = document.querySelector('#comment-create-form > input[name=content]')
+      const content = commentInput.value
+      const url = `${BASE_URL}/{{review.id}}/comment_create/`
+
+      axios({
+        url: url,
+        method: 'post',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {
+          content: content,
+        }
+      })
+      .then(res => {
+        console.log(res)
+        const commentId = res.data.commentId
+
+        const commentSpan = document.createElement('span')
+        commentSpan.innerText = content
+        commentInput.value = ''
+        commentSpan.classList.add('text-light')
+        
+        const commentUpdateButton = document.createElement('button')
+        commentUpdateButton.id = 'comment-update-button'
+        commentUpdateButton.innerText = '수정'
+        setCommentUpdate(commentUpdateButton)
+
+        const commentDeleteButton = document.createElement('button')
+        commentDeleteButton.id = 'comment-delete-button'
+        commentDeleteButton.innerText = '삭제'
+        setCommentDelete(commentDeleteButton)
+
+        const commmentDiv = document.createElement('div')
+        commmentDiv.id = `comment-div-${commentId}`
+        commmentDiv.dataset.commentId = commentId
+        commmentDiv.append(commentSpan, commentUpdateButton, commentDeleteButton)
+
+        commentsList.append(commmentDiv)
+      })
+      .catch(err => {
+        console.log(err)
+        alert('글을 작성해주세요.')
+      })
+    })
+
+  </script>
 {% endblock %}

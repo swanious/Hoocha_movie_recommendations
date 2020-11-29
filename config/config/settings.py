@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'accounts',
 
     'rest_framework',
+    'django_seed',
 
     'django.contrib.admin',
     'django.contrib.auth',

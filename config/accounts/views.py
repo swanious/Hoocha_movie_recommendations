@@ -8,7 +8,13 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST, require_http_methods, require_safe
 from django.contrib.auth import get_user_model, update_session_auth_hash
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
+
 from .forms import CustomUserChangeForm, CustomUserCreationForm, CustomLoginForm, CustomPasswordChangeForm
+from .serializers import CustomUserChangeSerializer
 
 # Create your views here.
 @require_http_methods(['GET', 'POST'])
@@ -56,20 +62,13 @@ def logout(request):
     return redirect('accounts:login')
 
 
-@login_required
-@require_http_methods(['GET', 'POST'])
+@api_view(['POST'])
 def update(request):
-    if request.method == 'POST':
-        form = CustomUserChangeForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('movies:index')
-    else:
-        form = CustomUserChangeForm(instance=request.user)
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/update.html', context)
+    if request.user.is_authenticated:
+        serializer = CustomUserChangeSerializer(data=request.data, instance=request.user)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'data' : 'success'})
 
 
 @require_POST
@@ -87,7 +86,7 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            return redirect('movies:index')
+            return redirect('accounts:profile', request.user.username)
     else:
         form = CustomPasswordChangeForm(request.user)
     context = {'form': form}

@@ -1,0 +1,29 @@
+body {
+  background: black url('../backgroundimages/image.png') right bottom;
+  background-size: cover;
+}
+
+.container {
+  width: 100%;
+  height:80%;
+}
+
+.row {
+  margin-top: 10rem;
+}
+
+
+.login-box {
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.75);
+  margin: 32px;
+  padding: 64px;
+}
+
+.signup-button,
+.login-button {
+  background-color: #b30000;
+  color: white;
+  display: block;
+}
+

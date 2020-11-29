@@ -1,0 +1,28 @@
+ul, ol, menu {
+  list-style: none;
+}
+
+.score_result {
+  margin: 1rem;
+}
+
+hr.new1 {
+  border-top: 2px dotted;
+}
+
+.modal-header {
+  background-color: #590707;
+}
+
+.modal-header .modal-title {
+
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+}
+
+.review-header {
+  margin-bottom: 10rem;
+}
