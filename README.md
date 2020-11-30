@@ -1,4 +1,4 @@
-# Final_pjt
+# 영화 추천 프로젝트
 
 > 오픈 API 활용 영화 추천 알고리즘
 >
@@ -14,48 +14,135 @@
 > - 아키텍처
 >   - Django Rest API (서버) & Vue.js (클라이언트)
 
-[toc]
+
+
+- [프로젝트 화면](#-------)
+  * [로그인 / 회원가입 화면](#-------------)
+  * [메인 화면 구성](#--------)
+  * [영화 상세 정보](#--------)
+  * [리뷰 / 댓글 작성](#----------)
+  * [한줄평](#---)
+  * [프로필 페이지](#-------)
+- [기능](#--)
+  * [데이터 베이스 모델링(ERD)](#------------erd-)
+  * [데이터 수집 및 가공](#-----------)
+    + [API 활용 데이터 불러오기 및 가공](#api-----------------)
+    + [영화 테이블](#------)
+    + [장르 테이블](#------)
+    + [M:N 중계 테이블 (영화 : 장르)](#m-n-----------------)
+    + [데이터 생성 코드](#---------)
+- [dummy data](#dummy-data)
+
+## 프로젝트 화면
+
+### 로그인 / 회원가입 화면
+
+- 회원가입 후 바로 메인 페이지 화면 전환
+
+![image-20201130144722156](README.assets/image-20201130144722156.png)
+
+![image-20201130144812260](README.assets/image-20201130144812260.png)
+
+### 메인 화면 구성
+
+- 좌측 네이게이션 바
+  - 테마 변경 가능
+  - 사용자 프로필 페이지 / 로그아웃 버튼
+- 메인 화면
+  - OpenweatherAPI를 활용한 날씨별 영화 추천
+  - 장르별 영화 추천
+  - 영화 클릭 시 디테일 화면 창 띄움(리뷰 작성 및 한줄평 남기기)
+
+![image-20201130145131232](README.assets/image-20201130145131232.png)
+
+![image-20201130144848736](README.assets/image-20201130144848736.png)
+
+### 영화 상세 정보
+
+- 영화 상세정보 페이지
+
+- 좌측 네비게이션 바
+  - 리뷰 및 댓글 작성
+  - 한줄평 작성
+
+![image-20201130145823857](README.assets/image-20201130145823857.png)
+
+![image-20201130145839933](README.assets/image-20201130145839933.png)
 
 
 
-## day01_1119 
+### 리뷰 / 댓글 작성
 
-> 데이터 베이스 모델링 (ERD cloud)
->
-> TMDB API 영화 데이터 추출
+- 리뷰 작성
+  - AJAX 요청으로 페이지 새로고침 없이 리뷰 생성 / 좋아요, 싫어요 기능 구현
+  - 작성자만 수정 가능
+
+![image-20201130145719931](README.assets/image-20201130145719931.png)
+
+![image-20201130150004582](README.assets/image-20201130150004582.png)
+
+![image-20201130150130642](README.assets/image-20201130150130642.png)
+
+- 상세 리뷰 페이지
+  - 작성자 글 수정 기능
+  - AJAX 요청으로 댓글 CUD 기능 구현
+
+![image-20201130150212478](README.assets/image-20201130150212478.png)
+
+![image-20201130150957270](README.assets/image-20201130150957270.png)
+
+![image-20201130151009454](README.assets/image-20201130151009454.png)
+
+- 생성
+
+![image-20201130150650934](README.assets/image-20201130150650934.png)
+
+![image-20201130150701013](README.assets/image-20201130150701013.png)
+
+- 수정
+
+![image-20201130150748696](README.assets/image-20201130150748696.png)
+
+![image-20201130150802623](README.assets/image-20201130150802623.png)
+
+
+
+### 한줄평
+
+- 한줄평 작성 기능
+  - AJAX 요청으로 새로고침 없이 CUD 및 좋아요/싫어요 기능
+  - 0~10점 평점 남기기
+  - 평점 데이터 반영
+    - 테스트를 위해 소숫자리 제거 x
+
+![image-20201130151408687](README.assets/image-20201130151408687.png)
+
+
+
+- 평점 반영
+
+![image-20201130152742204](README.assets/image-20201130152742204.png)
+
+![image-20201130151656608](README.assets/image-20201130151656608.png)
+
+### 프로필 페이지
+
+- 회원정보 수정 기능(비밀번호 변경, 이름 수정)
+- 비밀번호 변경 클릭 시 비밀번호 변경 페이지로 이동
+
+- 남긴 리뷰 / 댓글 확인
+
+![image-20201130153240541](README.assets/image-20201130153240541.png)
+
+
+
+## 기능
 
 ### 데이터 베이스 모델링(ERD)
 
-- 사용자 / 영화 리뷰 / 영화 한줄평 / 영화 리스트 / 팔로우
-
-![image-20201119103305754](README.assets/image-20201119103305754.png)
-
-- 영화
-
-![image-20201119172019658](README.assets/image-20201119172019658.png)
-
-- 영화 리뷰
-
-![image-20201119171856304](README.assets/image-20201119171856304.png)
-
-- 사용자
-  - 팔로우 기능
-    - 취향이 비슷한 사람들을 묶기 위한 기능(내부적으로 조작)
-    - 사용자에게는 보이지 않음
-
-![image-20201119172151397](README.assets/image-20201119172151397.png)
-
-- 한줄평
-
-![image-20201119172209367](README.assets/image-20201119172209367.png)
 
 
-
-#### Model
-
-- Movie / Genre / M:N 중계 테이블
-
-![image-20201120010859414](README.assets/image-20201120010859414.png)
+![image-20201130141402238](README.assets/image-20201130141402238.png)
 
 
 
@@ -265,174 +352,7 @@ def tmdb(request):
 
 
 
-## day2_1120
-
-> 메인 페이지 구성
->
-> 리뷰 페이지 (+ 댓글 기능) 기능 구현
->
-> 한줄평(평점) 시스템 기능 구현
-
-![image-20201120212913949](README.assets/image-20201120212913949.png)
-
-### 메인 페이지
-
-> - 메인 페이지
->   - 수집한 데이터의 `poster_path`를 통해 포스터 화면 출력
->   - 포스터 클릭 -> 영화 상세 페이지로 이동
->
-> - 상세 페이지
->   - 영화 줄거리 및 소개, 영상 등의 정보를 담음
->   - 내부에 리뷰 / 평점(한줄평) 남기기 기능을 추가
-
-
-
-### 리뷰
-
-> 리뷰 생성 / 상세 / 수정 / 삭제 기능 구현 
->
-> - 권한 있는 사용자만 리뷰 작성 가능(@login_require)
->
-> - 리뷰 페이지 내부에 댓글 기능 구현
-
-
-
-### 평점(한줄평)
-
-> 평점 및 한줄평 남기기 기능 구현
->
-> 평점 기능은 향후 추가 예정
-
-
-
-### 추가 할 일
-
-> 한줄평 / 댓글 수정 -> AJAX 요청으로 기능 구현
->
-> 리뷰 & 한줄평 - 좋아요/싫어요 기능 구현
->
-> 추천 알고리즘에 따른 메인 화면 구성 (장르별, 배우/감독별, 댓글 감정 분석 활용)
-
-
-
-
-
-## day3_1121
-
-> 사용자 인증 & 권한 페이지 기능 구현
->
-> widget활용 부트스트랩 클래스 적용
->
-> 영화 디테일 화면 구성 (bootstrap modal 컴포넌트 활용)
-
-- 메인 화면
-  - 횡스크롤 형식의 메인 페이지 구성
-  - 영화 클릭시 Modal 형식으로 디테일 화면으로 전환
-
-![image-20201121225703252](README.assets/image-20201121225703252.png)
-
-- 디테일 화면
-
-![image-20201121225619741](README.assets/image-20201121225619741.png)
-
-
-
-- 회원가입 페이지
-  - 부트스트랩 위젯 적용
-
-![image-20201121230529696](README.assets/image-20201121230529696.png)
-
-- 회원 정보 수정 페이지
-  - 내부 비밀번호 변경 페이지 삽입
-
-![image-20201121230337052](README.assets/image-20201121230337052.png)
-
-- 비밀번호 변경 페이지
-
-![image-20201121230436723](README.assets/image-20201121230436723.png)
-
-- accounts / forms.py
-
-```python
-from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCreationForm, PasswordChangeForm
-from django.contrib.auth import get_user_model
-from django import forms
-
-
-class CustomLoginForm(AuthenticationForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        class_update_fields = ['username', 'password']
-        for field_name in class_update_fields:
-            self.fields[field_name].widget.attrs.update({
-                'class': 'form-control',
-            })
-
-
-class CustomUserChangeForm(UserChangeForm):
-
-    password = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        class_update_fields = ['email', 'first_name', 'last_name']
-        for field_name in class_update_fields:
-            self.fields[field_name].widget.attrs.update({
-                'class': 'form-control'
-            })
-
-    class Meta:
-        model = get_user_model()
-        fields = ('email', 'first_name', 'last_name',)
-
-
-class CustomPasswordChangeForm(PasswordChangeForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        class_update_fields = ['old_password', 'new_password1', 'new_password2']
-        for field_name in class_update_fields:
-            self.fields[field_name].widget.attrs.update({
-                'class': 'form-control'
-            })
-
-    class Meta:
-        model = get_user_model()
-        fields = ('old_password', 'new_password1', 'new_password2',)
-
-
-class CustomUserCreationForm(UserCreationForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        class_update_fields = ['email', 'password1', 'password2']
-        for field_name in class_update_fields:
-            self.fields[field_name].widget.attrs.update({
-                'class': 'form-control'
-            })
-
-    class Meta:
-        model = get_user_model()
-        fields = (
-            'username',
-            'email',
-            'password1',
-            'password2',
-        )
-        widgets = {
-            'username': forms.TextInput(
-                attrs={
-                    'class': 'form-control',
-                }
-            ),
-        }
-```
-
-
-
 ## dummy data
-
-### day1_1119
 
 - 네이버 API
 

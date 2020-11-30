@@ -12,10 +12,9 @@
 
   <!-- 날씨별 -->
   <main>
-  
   {% if weather_movies %}
   <h2 class="mt-5 text-light">날씨별 영화 추천</h2>
-  <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel" data-interval="5000">
+  <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel" data-interval="2500">
     <div class="carousel-inner text-center">
     <!-- movie slide -->
       {% for movieList in weather_movies|customMovieList %}

@@ -55,6 +55,10 @@ body::-webkit-scrollbar-thumb {
   background-color: #370604;
 }
 
+.main-image {
+  width: 1200px;
+}
+
 footer {
   width: auto;
   position: absolute;
