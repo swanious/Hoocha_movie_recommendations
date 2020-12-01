@@ -1,37 +1,20 @@
-# 영화 추천 프로젝트
+# 영화 추천 프로젝트 HOOCHA 🎞🎞🎞
 
-> 오픈 API 활용 영화 추천 알고리즘
->
-> - 프로젝트 팀: 이강림, 오수완
->
-> - 언어
->   - Python 3.7.8
->   - Node x.x.x
->   - Vue.js 2.6.x
-> - 도구
->   - vsCode
->   - Chrome Browser
-> - 아키텍처
->   - Django Rest API (서버) & Vue.js (클라이언트)
+![Medium Badge](https://img.shields.io/badge/Python-v3.7.8-blue)![Medium Badge](https://img.shields.io/badge/Django-v3.1.3-blue)![Medium Badge](https://img.shields.io/badge/djangorestframework-v3.12.2-blue)![Medium Badge](https://img.shields.io/badge/Javascript-v1.7-red)![Medium Badge](https://img.shields.io/badge/License-TMBD-bri)
+
+## 프로젝트 개요
+
+- TMDB open API의 Top rated 데이터 활용
+
+- OpenWeather API 활용 날씨별 영화 장르 분류
+
+- 프로젝트 기간: 2020년 11월 19일 ~ 2020년 11월 27일
+
+- 프로젝트 팀원: 이강림, 오수완
+
+- 1000개의 영화 데이터 / 6개의 날씨 분류
 
 
-
-- [프로젝트 화면](#-------)
-  * [로그인 / 회원가입 화면](#-------------)
-  * [메인 화면 구성](#--------)
-  * [영화 상세 정보](#--------)
-  * [리뷰 / 댓글 작성](#----------)
-  * [한줄평](#---)
-  * [프로필 페이지](#-------)
-- [기능](#--)
-  * [데이터 베이스 모델링(ERD)](#------------erd-)
-  * [데이터 수집 및 가공](#-----------)
-    + [API 활용 데이터 불러오기 및 가공](#api-----------------)
-    + [영화 테이블](#------)
-    + [장르 테이블](#------)
-    + [M:N 중계 테이블 (영화 : 장르)](#m-n-----------------)
-    + [데이터 생성 코드](#---------)
-- [dummy data](#dummy-data)
 
 ## 프로젝트 화면
 
@@ -136,11 +119,9 @@
 
 
 
-## 기능
+## 프로젝트 기능
 
 ### 데이터 베이스 모델링(ERD)
-
-
 
 ![image-20201130141402238](README.assets/image-20201130141402238.png)
 
@@ -148,16 +129,10 @@
 
 ### 데이터 수집 및 가공
 
-> 네이버 API / 영화 진흥 위원회 / TMDB의 API 활용 데이터 수집 결과
+> **TMDB**
 >
-> - 네이버 
->   - 내가 원하는 영화 데이터를 뽑아오는 것은 활용도가 높음
->   - But, 불특정 다수(Top rated Movie / Popular Movie와 같은)의 영화 데이터를 한 번에 가져오는 것이 힘들다 판단하여 기각(취지에 어긋남)
-> - 영화 진흥 위원회
->   - TMDB와 비교하여 구체적인 분류로 데이터를 가져오는 것이 힘들다 판단하여 기각
-> - **TMDB**
->   - Top Rated / Popular / Detail 등 다양한 분류로 영화 데이터를 받아올 수 있음
->   - 불특정 다수의 영화 데이터를 한 번에 가져올 수 있고, 데이터 가공에 유리하다고 판단하여 채택
+> - Top Rated / Popular / Detail 등 다양한 분류로 영화 데이터를 받아올 수 있음
+> - 불특정 다수의 영화 데이터를 한 번에 가져올 수 있고, 데이터 가공에 유리하다고 판단하여 채택
 
 #### API 활용 데이터 불러오기 및 가공
 
