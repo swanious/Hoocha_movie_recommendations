@@ -467,7 +467,7 @@ def tmdb(request):
     # TMDB API를 활용하여 1 ~ 21 페이지에 해당하는 영화 정보 추출
     for page in range(1, 51):
         payload = {
-            'api_key': '7571218b4ab42912852227b3b4ea629c',
+            'api_key': 'my-key',
             'language': 'ko-KR',
             'page': page,
             'region': 'KR',
