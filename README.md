@@ -343,8 +343,8 @@ def naver(request):
         'query': '인터스텔라',
     }
     headers = {
-        'X-Naver-Client-Id': '7ptwva7zZrZdP2xgQCb9',
-        'X-Naver-Client-Secret': '6EHPskOKjd',
+        'X-Naver-Client-Id': 'my-id',
+        'X-Naver-Client-Secret': 'my-secret',
     }
     response = requests.get(
         'https://openapi.naver.com/v1/search/movie.json',
@@ -371,7 +371,7 @@ def kofic(request):
     API_URL = 'http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json'
     for i in range(1, 2):
         payload = {
-            'key': 'a56b3a9ad2d444b6e20f9f1d8d00db28',
+            'key': 'mykey',
             'curPage': i,
             'itemPerPage': 100,
             'prdtStartYear': '2000',
